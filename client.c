@@ -80,7 +80,8 @@ void readp(int sockfd) {
         perror("ERROR reading from socket");panic("ERROR reading from socket");
     } 
     uint16_t rec_msg_len = tcp_packet_len -2;
-    for (unsigned int i=0; i<=rec_msg_len; i++){
+    unsigned int i;
+    for (i=0; i<=rec_msg_len; i++){
         rec_message[i] = randombuf[i];
     }
     //printf(" Received Message length = %d\n", rec_msg_len);

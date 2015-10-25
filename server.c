@@ -33,7 +33,7 @@ void panic(const char *msg)
 }
 
 // function to send acknowledgement to client 
-void sendp(int sockfd, char* message) {
+int sendp(int sockfd, char* message) {
 	
 	// Calculates message length
 	int data_len = strlen(message);
@@ -53,12 +53,15 @@ void sendp(int sockfd, char* message) {
 	memcpy(&buffer[2], message, data_len);
 	int n = write(sockfd,buffer,tcp_msg_len);
 	if (n < 0) {
-		perror("Write Error"); panic("Write Error");
+		perror("Write Error"); //panic("Write Error");
+		return -1;
 	}
+
+	return 0;
 }
 
 // function to read from client
-void readp(int sockfd) {
+int readp(int sockfd) {
     int received = 0;
     char rec_message[256];
     unsigned char resbuf[2];
@@ -66,7 +69,8 @@ void readp(int sockfd) {
     bzero(resbuf, 2);
     received = read(sockfd,resbuf, 2);
     if (received < 0) {
-        perror("ERROR reading from socket");panic("ERROR reading from socket");
+        perror("ERROR reading from socket");//panic("ERROR reading from socket");
+		return -1;
     } 
     memcpy((char *) &rec_packet_len, (char *) &resbuf, sizeof(uint16_t));
     rec_packet_len = ntohs(rec_packet_len);
@@ -77,20 +81,45 @@ void readp(int sockfd) {
     bzero(randombuf, 256);
     received = read(sockfd,randombuf, tcp_packet_len - 2);
     if (received < 0) {
-        perror("ERROR reading from socket");panic("ERROR reading from socket");
+        perror("ERROR reading from socket");//panic("ERROR reading from socket");
+		return -1;
     } 
     uint16_t rec_msg_len = tcp_packet_len -2;
-    for (unsigned int i=0; i<=rec_msg_len; i++){
+    unsigned int i;
+    for (i=0; i<=rec_msg_len; i++){
         rec_message[i] = randombuf[i];
     }
     //printf(" Received Message length = %d\n", rec_msg_len);
     printf(" Message Received from client = %s\n", rec_message);
+	return 0;
+}
+
+int listen_for_connection(int sockfd, char argv0[], int port){
+    
+    struct sockaddr_in client_addr;
+    // -- start accepting incoming connections
+    listen(sockfd,5);
+    printf("%s listening on port: %d\n", argv0, port);
+
+    // -- accept one incoming connection
+    socklen_t client_len = sizeof(client_addr);
+
+    int newsockfd = accept(sockfd, (struct sockaddr*) &client_addr, &client_len);
+    if( newsockfd < 0 ) //{ perror("accept()"); panic("accept()"); }
+    {
+        perror("accept()");
+    }
+    else{
+        printf("Connection Established\n");
+    }
+    return newsockfd;
+
 }
 
 int main(int argc, char *argv[])
 {
     int sockfd;
-    struct sockaddr_in server_addr, client_addr;
+    struct sockaddr_in server_addr;
     int opt= 0;
     int port =-1;
 
@@ -141,29 +170,26 @@ int main(int argc, char *argv[])
     if( bind(sockfd, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0 ) {
         perror("bind()"); panic("bind()");
     }
+    
+    int newsockfd;
+    while(1){
+        newsockfd = listen_for_connection(sockfd, argv[0], port);
+        if(newsockfd >= 0){
+            printf(" Waiting for Hello message from client\n");
+            if(readp(newsockfd) >= 0){
+                printf(" Sending ACK message to client\n");
+                sendp(newsockfd, "ACK");
+            }
+        }
 
-    // -- start accepting incoming connections
-    listen(sockfd,5);
-    printf("%s listening on port: %d\n", argv[0], port);
-
-    // -- accept one incoming connection
-    socklen_t client_len = sizeof(client_addr);
-
-    int newsockfd = accept(sockfd, (struct sockaddr*) &client_addr, &client_len);
-    if( newsockfd < 0 ) { perror("accept()"); panic("accept()"); }
-
-    printf("Connection Established\n");
-    printf("%s\n",inet_ntoa(server_addr.sin_addr));
-    printf("%s\n",inet_ntoa(client_addr.sin_addr));
+    }
+    //printf("%s\n",inet_ntoa(server_addr.sin_addr));
+    //printf("%s\n",inet_ntoa(client_addr.sin_addr));
 
     // here communication would be possible using 'newsockfd'
-    printf(" Waiting for Hello message from client\n");
-
-    readp(newsockfd);
-    printf(" Sending ACK message to client\n");
-    sendp(newsockfd, "ACK");
-    printf(" Closing socket at Server side\n");
+    //printf(" Closing socket at Server side\n");
     close(sockfd);
+
     //pause();
     return 0;
 
