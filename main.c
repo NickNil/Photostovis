@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include "SyncManager.h"
 
 int main(void)
 {
-    printf("Hello World!\n");
+    photostovis_read_local_backup_file();
+
     return 0;
 }
 
