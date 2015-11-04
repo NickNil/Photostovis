@@ -88,6 +88,48 @@ void readp(int sockfd) {
     printf(" Received %s message from Server\n", rec_message);
 }
 
+void send_image(int socket)
+{
+	FILE *picture;
+	int size, packet_size, read_size, packet_index;	
+	char send_buffer[10240];
+	packet_index = 1;
+
+	picture = fopen("test_image.jpg", "r");
+
+	if(picture == NULL)
+	{
+		printf("error opening image\n");
+	}
+
+	fseek(picture, 0, SEEK_END);
+	size = ftell(picture);			//getting image size
+	fseek(picture, 0, SEEK_SET);
+	printf("picture size  = %i\n", size);
+	
+	//sending image size
+	write(socket, (void *)&size, sizeof(int));
+	int sent;
+	
+	//sending image as a byte array
+	while(!feof(picture))
+	{
+		read_size = fread(send_buffer, 1, sizeof(send_buffer)-1, picture);
+
+		do{		
+			packet_size = write(socket, send_buffer, read_size);
+		}while(packet_size < 0);
+		
+		/*printf("packet number: %i\n", packet_index);
+		printf("packet size sent: %i\n\n", read_size);
+		sent += read_size;
+		printf("sent: %i\n", sent);*/
+	
+		packet_index++;
+		bzero(send_buffer, sizeof(send_buffer));
+	}
+}
+
 int main(int argc, char *argv[])
 {
     int sockfd;
@@ -178,6 +220,8 @@ int main(int argc, char *argv[])
 	sendp(sockfd, hello_message); 
 	readp(sockfd);
 	
+	send_image(sockfd);
+
     printf(" Closing socket at client side\n");
     close(sockfd);
 
