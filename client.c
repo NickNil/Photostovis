@@ -143,23 +143,23 @@ void send_image(int socket)
     }
 }
 
-int main(int argc, char *argv[])
+int photostovis_connect_to_server(char* srv, int prt)
 {
     int sockfd;
     struct sockaddr_in server_addr;
     struct hostent *hp;
     int opt= 0;
-    int port =-1;
-    char* server=NULL;
+    int port = prt;
+    char* server= srv;
 
     //int i;
     //printf("%d\n", array_length(argv));
     //for(i=0; i<array_length(argv); i++)
     //{
-    //    printf("%s\n", argv[i]); 
+    //    printf("%s\n", argv[i]);
     //}
 
-
+/*
     //
     // Option Parsing using getopt 
     //
@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
         if(unit_testing==1) return 0;
     }
 
-
+*/
     // 
     // Create TCP/IP Socket
     //

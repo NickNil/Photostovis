@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <argp.h>
 #include "SyncManager.h"
+#include "client.h"
 
 const char *argp_program_version = "photostovis-0.0.1";
 const char *argp_program_bug_address = "<bugss@photostovis.com>";
@@ -11,11 +12,12 @@ static struct argp_option options[] =
 {
   {"sync",     's', 0,      0,  "Synchronizes files to server in default directory" },
   {"path",     'p', 0,      0,  "Synchronizes files to server at given path" },
+  {"connect",  'c', 0,      0,  "Connect to server" },
   { 0 }
 };
 
 struct arguments
-{s
+{
   char *args[2];
   int silent, verbose;
   char *output_file;
@@ -27,9 +29,14 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
 
   switch (key)
   {
+    case 'c':
+    {
+      photostovis_connect_to_server("127.0.0.1", 8000);
+      break;
+    }
     case 's':
     {
-      photostovis_read_local_backup_file();
+      photostovis_sync_files_to_server();
       break;
     }
     case 'v':
@@ -71,9 +78,6 @@ static struct argp argp = { options, parse_opt, args_doc, doc };
 int main (int argc, char **argv)
 {
     struct arguments arguments;
-    argp_parse (&argp, argc, argv, 0, 0, &arguments);
-    printf("ARG1 = %s\nARG2 = %s\n", arguments.args[0], arguments.args[1]);
-
-    return 0;
+    return argp_parse (&argp, argc, argv, 0, 0, &arguments);
 }
 
