@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <sys/socket.h> /* socket api */
 #include <netinet/in.h> /* inetaddr stucts */
 #include <netdb.h> /* gethostbyname() */
@@ -116,6 +117,74 @@ int listen_for_connection(int sockfd, char argv0[], int port){
 
 }
 
+//function to receive an image, only use if certain an image is to be sent
+void receive_image(int socket)
+{
+	int packet_size = 0, image_size = 0, receive_size = 0;
+	int read_size, write_size;
+	//int packet_index = 1;
+
+	char pict_array[10241];	
+	FILE *picture;
+	
+	while(packet_size == 0)
+	{
+		packet_size = read(socket, &image_size, sizeof(int));
+	}
+
+	printf("packet received\n");
+	printf("packet size = %i\n", packet_size);
+	printf("image size = %i\n", image_size);
+
+	picture = fopen("received_image.jpg", "w");
+
+	struct timeval timeout = {10,0};
+
+	fd_set fds;
+	int buffer_fd;
+	
+	while(receive_size < image_size) //loop until entire image is received
+	{
+		FD_ZERO(&fds);
+		FD_SET(socket, &fds);
+
+		buffer_fd = select(FD_SETSIZE, &fds, NULL, NULL, &timeout);
+
+		if(buffer_fd < 0){
+			printf("error: bad file descriptor\n");
+		}
+
+		if(buffer_fd == 0){
+			printf("error: buffer read timed out\n");
+		}
+
+		if(buffer_fd > 0)
+		{
+			do{
+				read_size = read(socket, pict_array, 10241);
+			}while (read_size < 0); 
+
+			write_size = fwrite(pict_array, 1, read_size, picture); //write picture to file
+
+			if(read_size != write_size){
+				printf("error in read write operation\n");
+			}
+			
+			/*printf("packet number received: %i\n", packet_index);
+			printf("packet size: %i\n", read_size);
+			printf("written image size: %i\n", write_size); 
+
+			receive_size += read_size;
+			packet_index++;
+			printf("total received image size: %i\n\n", receive_size);*/
+
+		}
+
+	}
+	fclose(picture);
+	printf("image (hopefully) successfully received :D\n\n");
+}
+
 int main(int argc, char *argv[])
 {
     int sockfd;
@@ -180,11 +249,15 @@ int main(int argc, char *argv[])
                 printf(" Sending ACK message to client\n");
                 sendp(newsockfd, "ACK");
             }
+		receive_image(newsockfd);
         }
+	
 
     }
     //printf("%s\n",inet_ntoa(server_addr.sin_addr));
     //printf("%s\n",inet_ntoa(client_addr.sin_addr));
+	
+	
 
     // here communication would be possible using 'newsockfd'
     //printf(" Closing socket at Server side\n");
