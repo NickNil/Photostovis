@@ -1,10 +1,10 @@
 /*
- * Global Software Development 
+ * Global Software Development
  *
- * Project - Photostovis 
+ * Project - Photostovis
  *
  * 2015-10-10
- * Server Program to create TCP socket and get images from client 
+ * Server Program to create TCP socket and get images from client
  *
  *
  */
@@ -35,32 +35,32 @@ void panic(const char *msg)
     exit(EXIT_FAILURE);
 }
 
-// function to send acknowledgement to client 
+// function to send acknowledgement to client
 int sendp(int sockfd, char* message) {
-	
-	// Calculates message length
-	int data_len = strlen(message);
-	//printf(" Data Length = %zu\n", strlen(message));
-	
-	// TCP Message length
-	int tcp_msg_len;
-	tcp_msg_len = 2 + data_len;
+
+    // Calculates message length
+    int data_len = strlen(message);
+    //printf(" Data Length = %zu\n", strlen(message));
+
+    // TCP Message length
+    int tcp_msg_len;
+    tcp_msg_len = 2 + data_len;
     //printf(" TCP Message Length = %d\n", tcp_msg_len);
-	unsigned char dumpbuffer[256];
-	bzero(dumpbuffer, 256);
+    unsigned char dumpbuffer[256];
+    bzero(dumpbuffer, 256);
 
-	uint16_t packet_len_buf = htons(tcp_msg_len);
-	unsigned char buffer[256];
-	bzero(buffer, 256);
-	memcpy((char *)&buffer[0], (char *) &packet_len_buf, sizeof(uint16_t));
-	memcpy(&buffer[2], message, data_len);
-	int n = write(sockfd,buffer,tcp_msg_len);
-	if (n < 0) {
-		perror("Write Error"); //panic("Write Error");
-		return -1;
-	}
+    uint16_t packet_len_buf = htons(tcp_msg_len);
+    unsigned char buffer[256];
+    bzero(buffer, 256);
+    memcpy((char *)&buffer[0], (char *) &packet_len_buf, sizeof(uint16_t));
+    memcpy(&buffer[2], message, data_len);
+    int n = write(sockfd,buffer,tcp_msg_len);
+    if (n < 0) {
+        perror("Write Error"); //panic("Write Error");
+        return -1;
+    }
 
-	return 0;
+    return 0;
 }
 
 // function to read from client
@@ -73,20 +73,20 @@ int readp(int sockfd) {
     received = read(sockfd,resbuf, 2);
     if (received < 0) {
         perror("ERROR reading from socket");//panic("ERROR reading from socket");
-		return -1;
-    } 
+        return -1;
+    }
     memcpy((char *) &rec_packet_len, (char *) &resbuf, sizeof(uint16_t));
     rec_packet_len = ntohs(rec_packet_len);
     uint16_t tcp_packet_len = rec_packet_len;
     //printf("Received TCP message length = %d\n", tcp_packet_len);
-    
+
     unsigned char randombuf[256];
     bzero(randombuf, 256);
     received = read(sockfd,randombuf, tcp_packet_len - 2);
     if (received < 0) {
         perror("ERROR reading from socket");//panic("ERROR reading from socket");
-		return -1;
-    } 
+        return -1;
+    }
     uint16_t rec_msg_len = tcp_packet_len -2;
     unsigned int i;
     for (i=0; i<=rec_msg_len; i++){
@@ -94,11 +94,11 @@ int readp(int sockfd) {
     }
     //printf(" Received Message length = %d\n", rec_msg_len);
     printf(" Message Received from client = %s\n", rec_message);
-	return 0;
+    return 0;
 }
 
 int listen_for_connection(int sockfd, char argv0[], int port){
-    
+
     struct sockaddr_in client_addr;
     // -- start accepting incoming connections
     listen(sockfd,5);
@@ -176,73 +176,73 @@ int send_file(int socket)
 //function to receive an image, only use if certain an image is to be sent
 void receive_image(int socket)
 {
-	int packet_size = 0, image_size = 0, receive_size = 0;
-	int read_size, write_size;
+    int packet_size = 0, image_size = 0, receive_size = 0;
+    int read_size, write_size;
     int packet_index = 1;
 
-	char pict_array[10241];	
-	FILE *picture;
-	
+    char pict_array[10241];
+    FILE *picture;
+
     //receive image size
-	while(packet_size == 0)
-	{
-		packet_size = read(socket, &image_size, sizeof(int));
-	}
+    while(packet_size == 0)
+    {
+        packet_size = read(socket, &image_size, sizeof(int));
+    }
 
     image_size = ntohl(image_size); //converting to host byte order
 
-	printf("packet received\n");
-	printf("packet size = %i\n", packet_size);
-	printf("image size = %i\n", image_size);
+    printf("packet received\n");
+    printf("packet size = %i\n", packet_size);
+    printf("image size = %i\n", image_size);
 
-	picture = fopen("received_image.jpg", "w");
+    picture = fopen("received_image.jpg", "w");
 
-	struct timeval timeout = {10,0};
+    struct timeval timeout = {10,0};
 
-	fd_set fds;
-	int buffer_fd;
-	
-	while(receive_size < image_size) //loop until entire image is received
-	{
-		FD_ZERO(&fds);
-		FD_SET(socket, &fds);
+    fd_set fds;
+    int buffer_fd;
 
-		buffer_fd = select(FD_SETSIZE, &fds, NULL, NULL, &timeout);
+    while(receive_size < image_size) //loop until entire image is received
+    {
+        FD_ZERO(&fds);
+        FD_SET(socket, &fds);
 
-		if(buffer_fd < 0){
-			printf("error: bad file descriptor\n");
-		}
+        buffer_fd = select(FD_SETSIZE, &fds, NULL, NULL, &timeout);
 
-		if(buffer_fd == 0){
-			printf("error: buffer read timed out\n");
-		}
+        if(buffer_fd < 0){
+            printf("error: bad file descriptor\n");
+        }
 
-		if(buffer_fd > 0)
-		{
-			do{
-				read_size = read(socket, pict_array, 10241);
-			}while (read_size < 0); 
+        if(buffer_fd == 0){
+            printf("error: buffer read timed out\n");
+        }
 
-			write_size = fwrite(pict_array, 1, read_size, picture); //write picture to file
+        if(buffer_fd > 0)
+        {
+            do{
+                read_size = read(socket, pict_array, 10241);
+            }while (read_size < 0);
 
-			if(read_size != write_size){
-				printf("error in read write operation\n");
-			}
-			
+            write_size = fwrite(pict_array, 1, read_size, picture); //write picture to file
+
+            if(read_size != write_size){
+                printf("error in read write operation\n");
+            }
+
             printf("packet number received: %i\n", packet_index);
-			printf("packet size: %i\n", read_size);
-			printf("written image size: %i\n", write_size); 
+            printf("packet size: %i\n", read_size);
+            printf("written image size: %i\n", write_size);
             printf("image size = %i\n", image_size);
 
-			receive_size += read_size;
-			packet_index++;
+            receive_size += read_size;
+            packet_index++;
             printf("total received image size: %i\n\n", receive_size);
 
-		}
+        }
 
-	}
-	fclose(picture);
-	printf("image (hopefully) successfully received :D\n\n");
+    }
+    fclose(picture);
+    printf("image (hopefully) successfully received :D\n\n");
 }
 
 int main(int argc, char *argv[])
@@ -252,24 +252,24 @@ int main(int argc, char *argv[])
     int opt= 0;
     int port =-1;
 
-    // Option Parsing using getopt 
+    // Option Parsing using getopt
     static struct option long_options[] = {
         {"port",       required_argument, 0,  'p' },
         {0,           0,                 0,  0   }
     };
 
     int long_index =0;
-    while ((opt = getopt_long_only(argc, argv,"", 
+    while ((opt = getopt_long_only(argc, argv,"",
                     long_options, &long_index )) != -1) {
         switch (opt) {
-            case 'p' :  
+            case 'p' :
                 if(!isdigit(optarg[0])){
                     panic("port argument is not a number?");
                 }
-                else { 
+                else {
                     port = atoi(optarg);}
                 break;
-            default: print_usage(); 
+            default: print_usage();
                      exit(EXIT_FAILURE);
         }
     }
@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
         perror("socket()"); panic("socket()");
     }
 
-    // -- listening socket struct 
+    // -- listening socket struct
     memset((char *) &server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
     if( bind(sockfd, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0 ) {
         perror("bind()"); panic("bind()");
     }
-    
+
     int newsockfd;
     while(1){
         newsockfd = listen_for_connection(sockfd, argv[0], port);
@@ -312,13 +312,13 @@ int main(int argc, char *argv[])
             //receive_image(newsockfd);
             send_file(newsockfd);
         }
-	
+
 
     }
     //printf("%s\n",inet_ntoa(server_addr.sin_addr));
     //printf("%s\n",inet_ntoa(client_addr.sin_addr));
-	
-	
+
+
 
     // here communication would be possible using 'newsockfd'
     //printf(" Closing socket at Server side\n");

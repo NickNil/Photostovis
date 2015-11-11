@@ -1,7 +1,7 @@
 /*
- * Global Software Development 
+ * Global Software Development
  *
- * Project - Photostovis 
+ * Project - Photostovis
  *
  * 2015-10-02
  * Client Program to create TCP socket and send images to server
@@ -80,7 +80,7 @@ void readp(int sockfd) {
     received = read(sockfd,resbuf, 2);
     if (received < 0) {
         perror("ERROR reading from socket");panic("ERROR reading from socket");
-    } 
+    }
     memcpy((char *) &rec_packet_len, (char *) &resbuf, sizeof(uint16_t));
     rec_packet_len = ntohs(rec_packet_len);
     uint16_t tcp_packet_len = rec_packet_len;
@@ -91,7 +91,7 @@ void readp(int sockfd) {
     received = read(sockfd,randombuf, tcp_packet_len - 2);
     if (received < 0) {
         perror("ERROR reading from socket");panic("ERROR reading from socket");
-    } 
+    }
     uint16_t rec_msg_len = tcp_packet_len -2;
     unsigned int i;
     for (i=0; i<=rec_msg_len; i++){
@@ -149,11 +149,11 @@ int receive_file(int socket)
 void send_image(int socket)
 {
     FILE *picture;
-    int size, packet_size, read_size, packet_index;	
+    int size, packet_size, read_size, packet_index;
     char send_buffer[10240];
     packet_index = 1;
 
-    picture = fopen("/home/global-sw-dev/Photostovis/test_image.jpg", "r");
+    picture = fopen("/home/global-sw-dev/Photostovis/image-03.jpg", "r");
 
     if(picture == NULL)
     {
@@ -175,7 +175,7 @@ void send_image(int socket)
     {
         read_size = fread(send_buffer, 1, sizeof(send_buffer)-1, picture);
 
-        do{		
+        do{
             packet_size = write(socket, send_buffer, read_size);
         }while(packet_size < 0);
 
@@ -208,7 +208,7 @@ int photostovis_connect_to_server(char* srv, int prt)
 
 /*
     //
-    // Option Parsing using getopt 
+    // Option Parsing using getopt
     //
     static struct option long_options[] = {
         {"port",       required_argument, 0,  'p' },
@@ -217,10 +217,10 @@ int photostovis_connect_to_server(char* srv, int prt)
     };
 
     int long_index =0;
-    while ((opt = getopt_long_only(argc, argv,"", 
+    while ((opt = getopt_long_only(argc, argv,"",
                     long_options, &long_index )) != -1) {
         switch (opt) {
-            case 'p' :  
+            case 'p' :
                 if(!isdigit(optarg[0])){
                     if(unit_testing==1) return -1;
                     //panic("port argument is not a number?");
@@ -231,7 +231,7 @@ int photostovis_connect_to_server(char* srv, int prt)
                 break;
             case 's' : server = optarg;
                        break;
-            default: print_usage(); 
+            default: print_usage();
                      if(unit_testing==1) return 1;
                      exit(EXIT_FAILURE);
         }
@@ -265,13 +265,13 @@ int photostovis_connect_to_server(char* srv, int prt)
     }
 
 */
-    // 
+    //
     // Create TCP/IP Socket
     //
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if( sockfd < 0 ) {
         perror("socket()");
-    }   
+    }
     // -- init destination address struct
     memset((char *) &server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
@@ -291,12 +291,12 @@ int photostovis_connect_to_server(char* srv, int prt)
     printf("Enter HELLO message to server\n");
     printf(">> ");
     char hello_message[256];
-    fgets(hello_message, 256, stdin);	
+    fgets(hello_message, 256, stdin);
     if ((strlen(hello_message)>0) && (hello_message[strlen(hello_message) - 1] == '\n')) {
         hello_message[strlen(hello_message) - 1] = '\0';
     }
     //printf("%s\n", hello_message);
-    sendp(sockfd, hello_message); 
+    sendp(sockfd, hello_message);
     readp(sockfd);
 
     //send_image(sockfd);

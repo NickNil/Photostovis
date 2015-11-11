@@ -1,4 +1,9 @@
+#include "client.h"
 #include "SyncManager.h"
+
+#define ARRAYSIZE(x)  (sizeof(x)/sizeof(*(x)))
+#define SHA256_DIGEST_LENGTH 32
+
 
 const char* photostovis_backup_file_getfield(char* line, int num)
 {
@@ -15,7 +20,7 @@ const char* photostovis_backup_file_getfield(char* line, int num)
 }
 
 
-struct BackupFileContent* photostovis_read_backup_file(char* backupFilePath)
+void photostovis_read_backup_file(char* backupFilePath, struct BackupFileContent* fileContent)
 {
    char* file_name = backupFilePath;
    FILE* fp = fopen(file_name,"r");
@@ -23,91 +28,57 @@ struct BackupFileContent* photostovis_read_backup_file(char* backupFilePath)
    if(fp == NULL)
    {
       perror("Error while opening backup file.\n");
-      return NULL;
+      return;
    }
-
-   int file_length = photostovis_read_number_of_lines_in_file(fp);
-   rewind(fp);
-
-   struct BackupFileContent file_content[file_length];
 
    char line[1024];
    int counter = 0;
    while (fgets(line, 1024, fp))
    {
        char* tmp = strdup(line);
-
        struct BackupFileContent temp_line;
-
        temp_line.pathHash = photostovis_backup_file_getfield(tmp, 0);
        temp_line.fileHash = photostovis_backup_file_getfield(tmp, 1);
-       temp_line.lineNumber = atoi(photostovis_backup_file_getfield(tmp, 2));
-       printf("\n%s, LINE: %d - %d", backupFilePath, temp_line.lineNumber, file_length);
-
-       file_content[counter] = temp_line;
-       free(tmp);
+       temp_line.filePath = photostovis_backup_file_getfield(tmp, 2);
+       fileContent[counter] = temp_line;
        counter++;
    }
+
    fclose(fp);
-
-   return file_content;
-
-   /*
-   struct BackupFileContent test_1;
-   test_1.fileHash = "29fabd8487c46119cc0a58540f4de6e6ef630326d6c1ffe47492e8633cc6f863";
-   test_1.pathHash = "29fabd8487c46119cc0a58540f4de6e6ef630326d6c1ffe47492e8633cc6f863";
-   test_1.lineNumber = 0;
-
-   struct BackupFileContent server[1];
-   server[0] = test_1;
-
-   photostovis_client_server_backup_diff(file_content, file_length, server, 1);
-   */
 }
 
 
 
-
-struct BackupFileContent* photostovis_client_server_backup_diff(struct BackupFileContent* client,
+void photostovis_client_server_backup_diff(struct BackupFileContent* client,
                                                                 unsigned int clientLength,
                                                                 struct BackupFileContent* server,
-                                                                unsigned int serverLength)
+                                                                unsigned int serverLength,
+                                                                struct BackupFileContent* result)
 {
-
     int equal;
 
     unsigned int i;
     unsigned int j;
     unsigned int k = 0;
 
-    struct BackupFileContent result[clientLength];
-
-     printf("\nc: %d", client[0].lineNumber);
-     printf("\nc: %d", client[1].lineNumber);
-     printf("\ns: %d", server[0].lineNumber);
     for(i = 0; i < clientLength; i++)
     {
         equal = 0;
         for(j = 0; j < serverLength; j++)
         {
-            if (client[i].pathHash == server[j].pathHash &&
-                client[i].fileHash == server[j].fileHash)
+            if (!strcmp(client[i].pathHash, server[j].pathHash) &&
+                !strcmp(client[i].fileHash, server[j].fileHash))
             {
                 equal = 1;
-                //printf("\n%d - MATCH: %s", i, client[i].fileHash);
-
             }
         }
 
         if (equal == 0)
         {
             result[k] = client[i];
-            printf("\n%s", client[i].fileHash);
             k++;
         }
     }
-
-    return result;
 }
 
 
@@ -133,7 +104,7 @@ void photostovis_sync_files_to_server()
     if(fp == NULL)
     {
        perror("Error while opening backup file.\n");
-       return NULL;
+       return;
     }
 
     int server_file_length = photostovis_read_number_of_lines_in_file(fp);
@@ -147,30 +118,44 @@ void photostovis_sync_files_to_server()
     if(client_fp == NULL)
     {
        perror("Error while opening backup file.\n");
-       return NULL;
+       return;
     }
 
     int client_file_length = photostovis_read_number_of_lines_in_file(client_fp);
     rewind(client_fp);
     fclose(client_fp);
 
-    struct BackupFileContent* Server = photostovis_read_backup_file(path);
+    struct BackupFileContent server[server_file_length];
+    photostovis_read_backup_file(path, server);
     int i;
     for(i = 0; i < server_file_length; i++)
     {
-       printf("\n SERVER: %d", Server[i].lineNumber);
+       //printf("\n SERVER: %d", Server[i].lineNumber);
     }
 
-    struct BackupFileContent* Client = photostovis_read_backup_file(client_path);
+    struct BackupFileContent client[client_file_length];
+    photostovis_read_backup_file(client_path, client);
 
     for(i = 0; i < client_file_length; i++)
     {
-       printf("\n CLIENT: %d", Client[i].lineNumber);
+        //printf("\n CLIENT: %d", client[i].lineNumber);
     }
-/*
-    struct BackupFileContent* result = photostovis_client_server_backup_diff(Client, client_file_length,
-                                                                             Server, server_file_length);
 
-*/
+    struct BackupFileContent result[client_file_length];
+    photostovis_client_server_backup_diff(client, client_file_length, server, server_file_length, result);
+
+
+    for(i = 0; i < client_file_length; i++)
+    {
+        // Ensure we only are working on valid files
+        if (result[i].fileHash != NULL)
+        {
+            printf("\nSaving file: %s\n", result[i].fileHash);
+        }
+    }
+
+
 
 }
+
+
