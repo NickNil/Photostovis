@@ -13,11 +13,13 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#include <sys/stat.h>
 #include <sys/socket.h> /* socket api */
 #include <netinet/in.h> /* inetaddr stucts */
 #include <netdb.h> /* gethostbyname() */
 #include <arpa/inet.h>
 #include <string.h>
+#include <errno.h>
 #include <unistd.h>
 #include <getopt.h>
 #include <stdint.h>
@@ -117,20 +119,77 @@ int listen_for_connection(int sockfd, char argv0[], int port){
 
 }
 
+//function for sending a .txt file
+int send_file(int socket)
+{
+    FILE *text_file;
+    int file_size, packet_size = 0, read_size = 0;
+    char send_buffer[256];
+    struct stat file_stat;
+
+    text_file  = fopen("/home/global-sw-dev/Photostovis/server-backup.txt", "r");
+
+    if(text_file == NULL)
+    {
+        printf("error opening file\n");
+        return -1;
+    }
+
+    //finding file size
+    if (stat("/home/global-sw-dev/Photostovis/server-backup.txt", &file_stat) < 0)
+    {
+        printf("error withfile stat: %s", strerror(errno));
+        return -1;
+    }
+    file_size = (int)file_stat.st_size;
+
+    printf("file size: %d bytes\n", file_size);
+
+    //sending file size
+    if(write(socket, (void *)&file_size, sizeof(int)) < 0)
+    {
+        printf("error sending file size: %s", strerror(errno));
+    }
+
+    //sending file
+    while(!feof(text_file))
+    {
+        read_size = fread(send_buffer, 1, sizeof(send_buffer)-1, text_file);
+
+        do{
+            packet_size = write(socket, send_buffer, read_size);
+        }while(packet_size < 0);
+
+        //printf("packet number: %i\n", packet_index);
+          //printf("packet size sent: %i\n", read_size);
+           //printf("file size  = %i\n", file_size);
+
+        bzero(send_buffer, sizeof(send_buffer));
+    }
+    printf("file hopefully successfully sent");
+
+
+
+    return 0;
+}
+
 //function to receive an image, only use if certain an image is to be sent
 void receive_image(int socket)
 {
 	int packet_size = 0, image_size = 0, receive_size = 0;
 	int read_size, write_size;
-	//int packet_index = 1;
+    int packet_index = 1;
 
 	char pict_array[10241];	
 	FILE *picture;
 	
+    //receive image size
 	while(packet_size == 0)
 	{
 		packet_size = read(socket, &image_size, sizeof(int));
 	}
+
+    image_size = ntohl(image_size); //converting to host byte order
 
 	printf("packet received\n");
 	printf("packet size = %i\n", packet_size);
@@ -170,13 +229,14 @@ void receive_image(int socket)
 				printf("error in read write operation\n");
 			}
 			
-			/*printf("packet number received: %i\n", packet_index);
+            printf("packet number received: %i\n", packet_index);
 			printf("packet size: %i\n", read_size);
 			printf("written image size: %i\n", write_size); 
+            printf("image size = %i\n", image_size);
 
 			receive_size += read_size;
 			packet_index++;
-			printf("total received image size: %i\n\n", receive_size);*/
+            printf("total received image size: %i\n\n", receive_size);
 
 		}
 
@@ -249,7 +309,8 @@ int main(int argc, char *argv[])
                 printf(" Sending ACK message to client\n");
                 sendp(newsockfd, "ACK");
             }
-		receive_image(newsockfd);
+            //receive_image(newsockfd);
+            send_file(newsockfd);
         }
 	
 

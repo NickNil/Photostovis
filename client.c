@@ -101,6 +101,51 @@ void readp(int sockfd) {
     printf(" Received %s message from Server\n", rec_message);
 }
 
+int receive_file(int socket)
+{
+    int file_size = 0, packet_size = 0, receive_size = 0, read_size = 0, write_size = 0;
+
+    char buffer[256];
+    FILE *received_file;
+
+    while(packet_size == 0)
+    {
+            packet_size = read(socket, &file_size, sizeof(int));
+    }
+
+    printf("packet received\n");
+    printf("packet size = %i\n", packet_size);
+    printf("image size = %i\n", file_size);
+
+    received_file = fopen("/home/global-sw-dev/Photostovis/received_file.txt", "w");
+
+    while(receive_size < file_size)
+    {
+        do{
+            read_size = read(socket, buffer, 256); //receive file data
+        }while (read_size < 0);
+
+        write_size = fwrite(buffer, 1, read_size, received_file); //write data to file
+
+        if(read_size != write_size){
+            printf("error in read write operation\n");
+        }
+
+        //printf("packet number received: %i\n", packet_index);
+        printf("packet size: %i\n", read_size);
+        printf("written file size: %i\n", write_size);
+        printf("file size = %i\n", file_size);
+
+        receive_size += read_size;
+        //packet_index++;
+        printf("total received file size: %i\n\n", receive_size);
+
+    }
+    printf("file (hopefully) received successfully :D\n");
+    fclose(received_file);
+    return 0;
+}
+
 void send_image(int socket)
 {
     FILE *picture;
@@ -108,7 +153,7 @@ void send_image(int socket)
     char send_buffer[10240];
     packet_index = 1;
 
-    picture = fopen("test_image.jpg", "r");
+    picture = fopen("/home/global-sw-dev/Photostovis/test_image.jpg", "r");
 
     if(picture == NULL)
     {
@@ -119,10 +164,11 @@ void send_image(int socket)
     size = ftell(picture);			//getting image size
     fseek(picture, 0, SEEK_SET);
     printf("picture size  = %i\n", size);
+    size = htonl(size); //converting size to network byte order
 
     //sending image size
     write(socket, (void *)&size, sizeof(int));
-    //int sent;
+    int sent;
 
     //sending image as a byte array
     while(!feof(picture))
@@ -133,10 +179,11 @@ void send_image(int socket)
             packet_size = write(socket, send_buffer, read_size);
         }while(packet_size < 0);
 
-        /*printf("packet number: %i\n", packet_index);
-          printf("packet size sent: %i\n\n", read_size);
+        printf("packet number: %i\n", packet_index);
+          printf("packet size sent: %i\n", read_size);
+           printf("picture size  = %i\n", size);
           sent += read_size;
-          printf("sent: %i\n", sent);*/
+          printf("sent: %i\n", sent);
 
         packet_index++;
         bzero(send_buffer, sizeof(send_buffer));
@@ -252,7 +299,8 @@ int photostovis_connect_to_server(char* srv, int prt)
     sendp(sockfd, hello_message); 
     readp(sockfd);
 
-    send_image(sockfd);
+    //send_image(sockfd);
+    receive_file(sockfd);
 
     printf(" Closing socket at client side\n");
     close(sockfd);
