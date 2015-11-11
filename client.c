@@ -1,7 +1,7 @@
 /*
- * Global Software Development 
+ * Global Software Development
  *
- * Project - Photostovis 
+ * Project - Photostovis
  *
  * 2015-10-02
  * Client Program to create TCP socket and send images to server
@@ -80,7 +80,7 @@ void readp(int sockfd) {
     received = read(sockfd,resbuf, 2);
     if (received < 0) {
         perror("ERROR reading from socket");panic("ERROR reading from socket");
-    } 
+    }
     memcpy((char *) &rec_packet_len, (char *) &resbuf, sizeof(uint16_t));
     rec_packet_len = ntohs(rec_packet_len);
     uint16_t tcp_packet_len = rec_packet_len;
@@ -91,7 +91,7 @@ void readp(int sockfd) {
     received = read(sockfd,randombuf, tcp_packet_len - 2);
     if (received < 0) {
         perror("ERROR reading from socket");panic("ERROR reading from socket");
-    } 
+    }
     uint16_t rec_msg_len = tcp_packet_len -2;
     unsigned int i;
     for (i=0; i<=rec_msg_len; i++){
@@ -101,14 +101,59 @@ void readp(int sockfd) {
     printf(" Received %s message from Server\n", rec_message);
 }
 
+int receive_file(int socket)
+{
+    int file_size = 0, packet_size = 0, receive_size = 0, read_size = 0, write_size = 0;
+
+    char buffer[256];
+    FILE *received_file;
+
+    while(packet_size == 0)
+    {
+            packet_size = read(socket, &file_size, sizeof(int));
+    }
+
+    printf("packet received\n");
+    printf("packet size = %i\n", packet_size);
+    printf("image size = %i\n", file_size);
+
+    received_file = fopen("/home/global-sw-dev/Photostovis/received_file.txt", "w");
+
+    while(receive_size < file_size)
+    {
+        do{
+            read_size = read(socket, buffer, 256); //receive file data
+        }while (read_size < 0);
+
+        write_size = fwrite(buffer, 1, read_size, received_file); //write data to file
+
+        if(read_size != write_size){
+            printf("error in read write operation\n");
+        }
+
+        //printf("packet number received: %i\n", packet_index);
+        printf("packet size: %i\n", read_size);
+        printf("written file size: %i\n", write_size);
+        printf("file size = %i\n", file_size);
+
+        receive_size += read_size;
+        //packet_index++;
+        printf("total received file size: %i\n\n", receive_size);
+
+    }
+    printf("file (hopefully) received successfully :D\n");
+    fclose(received_file);
+    return 0;
+}
+
 void send_image(int socket)
 {
     FILE *picture;
-    int size, packet_size, read_size, packet_index;	
+    int size, packet_size, read_size, packet_index;
     char send_buffer[10240];
     packet_index = 1;
 
-    picture = fopen("test_image.jpg", "r");
+    picture = fopen("/home/global-sw-dev/Photostovis/image-03.jpg", "r");
 
     if(picture == NULL)
     {
@@ -119,24 +164,26 @@ void send_image(int socket)
     size = ftell(picture);			//getting image size
     fseek(picture, 0, SEEK_SET);
     printf("picture size  = %i\n", size);
+    size = htonl(size); //converting size to network byte order
 
     //sending image size
     write(socket, (void *)&size, sizeof(int));
-    //int sent;
+    int sent;
 
     //sending image as a byte array
     while(!feof(picture))
     {
         read_size = fread(send_buffer, 1, sizeof(send_buffer)-1, picture);
 
-        do{		
+        do{
             packet_size = write(socket, send_buffer, read_size);
         }while(packet_size < 0);
 
-        /*printf("packet number: %i\n", packet_index);
-          printf("packet size sent: %i\n\n", read_size);
+        printf("packet number: %i\n", packet_index);
+          printf("packet size sent: %i\n", read_size);
+           printf("picture size  = %i\n", size);
           sent += read_size;
-          printf("sent: %i\n", sent);*/
+          printf("sent: %i\n", sent);
 
         packet_index++;
         bzero(send_buffer, sizeof(send_buffer));
@@ -161,7 +208,7 @@ int photostovis_connect_to_server(char* srv, int prt)
 
 /*
     //
-    // Option Parsing using getopt 
+    // Option Parsing using getopt
     //
     static struct option long_options[] = {
         {"port",       required_argument, 0,  'p' },
@@ -170,10 +217,10 @@ int photostovis_connect_to_server(char* srv, int prt)
     };
 
     int long_index =0;
-    while ((opt = getopt_long_only(argc, argv,"", 
+    while ((opt = getopt_long_only(argc, argv,"",
                     long_options, &long_index )) != -1) {
         switch (opt) {
-            case 'p' :  
+            case 'p' :
                 if(!isdigit(optarg[0])){
                     if(unit_testing==1) return -1;
                     //panic("port argument is not a number?");
@@ -184,7 +231,7 @@ int photostovis_connect_to_server(char* srv, int prt)
                 break;
             case 's' : server = optarg;
                        break;
-            default: print_usage(); 
+            default: print_usage();
                      if(unit_testing==1) return 1;
                      exit(EXIT_FAILURE);
         }
@@ -218,13 +265,13 @@ int photostovis_connect_to_server(char* srv, int prt)
     }
 
 */
-    // 
+    //
     // Create TCP/IP Socket
     //
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if( sockfd < 0 ) {
         perror("socket()");
-    }   
+    }
     // -- init destination address struct
     memset((char *) &server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
@@ -244,15 +291,16 @@ int photostovis_connect_to_server(char* srv, int prt)
     printf("Enter HELLO message to server\n");
     printf(">> ");
     char hello_message[256];
-    fgets(hello_message, 256, stdin);	
+    fgets(hello_message, 256, stdin);
     if ((strlen(hello_message)>0) && (hello_message[strlen(hello_message) - 1] == '\n')) {
         hello_message[strlen(hello_message) - 1] = '\0';
     }
     //printf("%s\n", hello_message);
-    sendp(sockfd, hello_message); 
+    sendp(sockfd, hello_message);
     readp(sockfd);
 
-    send_image(sockfd);
+    //send_image(sockfd);
+    receive_file(sockfd);
 
     printf(" Closing socket at client side\n");
     close(sockfd);

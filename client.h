@@ -9,5 +9,6 @@ extern void sendp(int sockfd, char* message);
 extern void readp(int sockfd);
 extern int original_main(int argc, char *argv[]);
 int photostovis_connect_to_server(char* server, int port);
+void send_image(int socket);
 
 #endif
