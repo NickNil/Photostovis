@@ -1,9 +1,9 @@
 #include "FileManager.h"
 
-void photostovis_get_filenames_from_client()
+void photostovis_get_filenames_from_client(char* const currentPath, const unsigned int currentPathLen)
 {
     DIR *dirp;
-    char* path = "/home/global-sw-dev/Photostovis/pictures/";
+    const char* path = currentPath;//"/home/global-sw-dev/Photostovis/pictures/";
     struct dirent *dp;
     char * filename;
     char * fullpath;
@@ -16,9 +16,9 @@ void photostovis_get_filenames_from_client()
             fullpath = (char *) malloc(1 + strlen(path)+ strlen(filename) );
             strcpy(fullpath, path);
             strcat(fullpath, filename);
-            char hash_content[32];
+            char hash_content[65];
             photostovis_hash_file_content_on_client(fullpath, hash_content);
-            char hash_path[32];
+            char hash_path[65];
             photostovis_hash_file_path_on_client(fullpath, hash_path);
             char* newpath = fullpath;
 
@@ -27,12 +27,14 @@ void photostovis_get_filenames_from_client()
             printf("\n FULLPATH: %s", newpath);
             printf("\n HASHPATH: %s", hash_path);
             printf("\n HASHCONTENT: %s", hash_content);
+
+            photostovis_write_to_backup_file(newpath, hash_path, hash_content);
         }
     }
     closedir(dirp);
 }
 
-int photostovis_hash_file_content_on_client(char* fullpath, char output[32])
+int photostovis_hash_file_content_on_client(char* fullpath, char output[65])
 {
     FILE* file = fopen(fullpath, "rb");
     if(!file) return -1;
@@ -56,7 +58,7 @@ int photostovis_hash_file_content_on_client(char* fullpath, char output[32])
     return 0;
 }
 
-int photostovis_hash_file_path_on_client(char* path, char output[32])
+int photostovis_hash_file_path_on_client(char* path, char output[65])
 {
     unsigned char buf[SHA256_BLOCK_SIZE];
     SHA256_CTX ctx;
@@ -69,7 +71,7 @@ int photostovis_hash_file_path_on_client(char* path, char output[32])
     return 0;
 }
 
-void sha256_hash_string (char hash[SHA256_BLOCK_SIZE], char outputBuffer[32])
+void sha256_hash_string (char hash[SHA256_BLOCK_SIZE], char outputBuffer[65])
 {
     int i = 0;
 
@@ -78,5 +80,26 @@ void sha256_hash_string (char hash[SHA256_BLOCK_SIZE], char outputBuffer[32])
         sprintf(outputBuffer + (i * 2), "%02x", (unsigned char)hash[i]);
     }
 
-    //outputBuffer[64] = 0;
+    outputBuffer[64] = 0;
+}
+
+void photostovis_write_to_backup_file(char* path, char hash_path[65], char hash_file[65])
+{
+    char* backup_path = "/home/global-sw-dev/Photostovis/backup.txt";
+    FILE* file = fopen(backup_path, "a");
+    fprintf(file,"%s","\"");
+    fprintf(file,"%s",path);
+    fprintf(file,"%s","\"");
+    fprintf(file,"%s",",");
+    fprintf(file,"%s",hash_path);
+    fprintf(file,"%s",",");
+    fprintf(file,"%s",hash_file);
+    fprintf(file,"%s","\r\n");
+}
+
+void photostovis_clear_backup_file()
+{
+    char* backup_path = "/home/global-sw-dev/Photostovis/backup.txt";
+    FILE* file = fopen(backup_path, "w");
+    fclose(file);
 }

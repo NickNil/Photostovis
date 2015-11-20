@@ -33,13 +33,17 @@ void photostovis_read_backup_file(char* backupFilePath, struct BackupFileContent
 
    char line[1024];
    int counter = 0;
+
+   printf("\n PATH: %s", backupFilePath);
+
    while (fgets(line, 1024, fp))
    {
        char* tmp = strdup(line);
        struct BackupFileContent temp_line;
-       temp_line.pathHash = photostovis_backup_file_getfield(tmp, 0);
-       temp_line.fileHash = photostovis_backup_file_getfield(tmp, 1);
-       temp_line.filePath = photostovis_backup_file_getfield(tmp, 2);
+       temp_line.filePath = photostovis_backup_file_getfield(tmp, 0);
+       temp_line.pathHash = photostovis_backup_file_getfield(tmp, 1);
+       temp_line.fileHash = photostovis_backup_file_getfield(tmp, 2);
+       printf("\n FULLPATH: %s", tmp);
        fileContent[counter] = temp_line;
        counter++;
    }
@@ -122,6 +126,7 @@ void photostovis_sync_files_to_server()
     }
 
     int client_file_length = photostovis_read_number_of_lines_in_file(client_fp);
+    printf("\n CLIENTL: %d", client_file_length);
     rewind(client_fp);
     fclose(client_fp);
 
@@ -138,7 +143,7 @@ void photostovis_sync_files_to_server()
 
     for(i = 0; i < client_file_length; i++)
     {
-        //printf("\n CLIENT: %d", client[i].lineNumber);
+        printf("\n CLIENT: %s", client[i].filePath);
     }
 
     struct BackupFileContent result[client_file_length];
