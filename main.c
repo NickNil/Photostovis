@@ -115,6 +115,7 @@ int main (int argc, char **argv)
 
   if (arguments.sync)
   {
+     //photostovis_get_filenames_from_client();
      printf("Syncing files to server...");
      photostovis_sync_files_to_server();
      printf("Done syncing files to server!\n");

@@ -6,5 +6,6 @@
 #include <sha256.h>
 
 void photostovis_get_filenames_from_client();
-void photostovis_hash_file_content_on_client(char* name, char* path);
-char* photostovis_hash_file_path_on_client(char* path);
+int photostovis_hash_file_content_on_client(char* fullpath, char output[32]);
+int photostovis_hash_file_path_on_client(char* path, char output[32]);
+void sha256_hash_string (char hash[SHA256_BLOCK_SIZE], char outputBuffer[32]);
