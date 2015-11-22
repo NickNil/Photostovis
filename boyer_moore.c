@@ -13,8 +13,8 @@
 // needed to shift pat forward to get string[i] lined up
 // with some character in pat.
 // this algorithm runs in alphabet_len+patlen time.
-void make_delta1(int *delta1, uint8_t *pat, int32_t patlen) {
-    int i;
+void make_delta1(int *delta1, unsigned char *pat, unsigned int patlen) {
+    unsigned int i;
     for (i=0; i < ALPHABET_LEN; i++) {
         delta1[i] = NOT_FOUND;
     }
@@ -25,7 +25,7 @@ void make_delta1(int *delta1, uint8_t *pat, int32_t patlen) {
 
 // true if the suffix of word starting from word[pos] is a prefix
 // of word
-int is_prefix(uint8_t *word, int wordlen, int pos) {
+int is_prefix(unsigned char *word, int wordlen, int pos) {
     int i;
     int suffixlen = wordlen - pos;
     // could also use the strncmp() library function here
@@ -39,7 +39,7 @@ int is_prefix(uint8_t *word, int wordlen, int pos) {
 
 // length of the longest suffix of word ending on word[pos].
 // suffix_length("dddbcabc", 8, 4) = 2
-int suffix_length(uint8_t *word, int wordlen, int pos) {
+int suffix_length(unsigned char *word, int wordlen, int pos) {
     int i;
     // increment suffix length i to the first mismatch or beginning
     // of the word
@@ -82,7 +82,7 @@ int suffix_length(uint8_t *word, int wordlen, int pos) {
 // The second loop addresses case 2. Since suffix_length may not be
 // unique, we want to take the minimum value, which will tell us
 // how far away the closest potential match is.
-void make_delta2(int *delta2, uint8_t *pat, int32_t patlen) {
+void make_delta2(int *delta2, unsigned char *pat, unsigned int patlen) {
     int p;
     int last_prefix_index = patlen-1;
 
@@ -103,7 +103,7 @@ void make_delta2(int *delta2, uint8_t *pat, int32_t patlen) {
     }
 }
 
-uint8_t* boyer_moore (uint8_t *string, uint32_t stringlen, uint8_t *pat, uint32_t patlen) {
+unsigned char* boyer_moore (unsigned char *string, unsigned int stringlen, unsigned char *pat, unsigned int patlen) {
     int i;
     int delta1[ALPHABET_LEN];
     int *delta2 = (int *)malloc(patlen * sizeof(int));

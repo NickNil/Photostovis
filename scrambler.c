@@ -132,6 +132,7 @@ void scrambleFileContents(FILE *srcFilePtr, FILE *destFilePtr, unsigned char *ke
         fclose(destFilePtr);
         exit(-1);
     }
+
     /* cycle through the while file until EOF */
     while (feof(srcFilePtr) == 0)
     {
@@ -148,7 +149,7 @@ void scrambleFileContents(FILE *srcFilePtr, FILE *destFilePtr, unsigned char *ke
                  * so we will just use the starting bytes of the key sequence with this chunk */
                 zeroCharBuffer(tempBuffer, keyLen, readBytes);
                 /* now, XOR tempBuffer into keySequence and return cause we've done everything we could */
-                xorCharBuffers(tempBuffer, keySequence, readBytes);
+                xorCharBuffers(keySequence, tempBuffer, readBytes);
                 /* now write this chunk to the destination file and return */
                 size_t writtenBytes = fwrite(tempBuffer, 1, readBytes, destFilePtr);
                 /* make sure that the information has been writen */
@@ -176,10 +177,11 @@ void scrambleFileContents(FILE *srcFilePtr, FILE *destFilePtr, unsigned char *ke
         {
 
             /* XOR the chunk of bytes we've just read with the keySequence contents */
-            xorCharBuffers(tempBuffer, keySequence, keyLen);
+            xorCharBuffers(keySequence, tempBuffer, keyLen);
             /* now write this chunk to the destination file and return */
             size_t writtenBytes = fwrite(tempBuffer, 1, readBytes, destFilePtr);
             /* make sure that the information has been writen */
+
             if (writtenBytes < readBytes)
             {
                 /* some sort of error happened during writing of the file, abort and exit */
@@ -190,7 +192,6 @@ void scrambleFileContents(FILE *srcFilePtr, FILE *destFilePtr, unsigned char *ke
                 exit(-1);
             }
         }
-
     }
 
     /* free the memory block previously allocated */
@@ -375,7 +376,7 @@ void deShiftFileContents(FILE *srcFilePtr, FILE *destFilePtr, unsigned char *sta
     /* move file pointer to the end of the file */
     fseek(srcFilePtr, 0L, SEEK_END);
     /* now query the location of the file pointer */
-    srcFileSize = ftell(srcFilePtr) + 1;
+    srcFileSize = ftell(srcFilePtr);
     /* finally reset the pointer back to the beginning of the file */
     fseek(srcFilePtr, 0L, SEEK_SET);
 
@@ -396,7 +397,7 @@ void deShiftFileContents(FILE *srcFilePtr, FILE *destFilePtr, unsigned char *sta
     while (feof(srcFilePtr) == 0)
     {
         /* read whole file into tempBuffer */
-        readBytes += fread((fileBuffer+readBytes), 1, (srcFileSize - readBytes), srcFilePtr);
+        readBytes += fread((fileBuffer+readBytes), 1, (srcFileSize + 1 - readBytes), srcFilePtr);
         /* again, check that we have read the correct number of bytes */
         if (readBytes < srcFileSize)
         {
