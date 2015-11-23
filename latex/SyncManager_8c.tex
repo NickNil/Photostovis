@@ -1,0 +1,121 @@
+\hypertarget{SyncManager_8c}{\section{Sync\-Manager.\-c File Reference}
+\label{SyncManager_8c}\index{Sync\-Manager.\-c@{Sync\-Manager.\-c}}
+}
+{\ttfamily \#include \char`\"{}client.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Sync\-Manager.\-h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{SyncManager_8c_a9670edf37e84bf953c542953136abfd6}{\#define {\bfseries A\-R\-R\-A\-Y\-S\-I\-Z\-E}(x)~(sizeof(x)/sizeof($\ast$(x)))}\label{SyncManager_8c_a9670edf37e84bf953c542953136abfd6}
+
+\item 
+\hypertarget{SyncManager_8c_aa9cf0abf87b30c4c63e9c7e89c590579}{\#define {\bfseries S\-H\-A256\-\_\-\-D\-I\-G\-E\-S\-T\-\_\-\-L\-E\-N\-G\-T\-H}~32}\label{SyncManager_8c_aa9cf0abf87b30c4c63e9c7e89c590579}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char $\ast$ \hyperlink{SyncManager_8c_afa23cff79af756f10ed8d4ce1bc00020}{photostovis\-\_\-backup\-\_\-file\-\_\-getfield} (char $\ast$line, int num)
+\begin{DoxyCompactList}\small\item\em Reads the number of lines in a file. \end{DoxyCompactList}\item 
+void \hyperlink{SyncManager_8c_abbf359d6d4f893fab87e81de67f485ac}{photostovis\-\_\-read\-\_\-backup\-\_\-file} (char $\ast$backup\-File\-Path, struct \hyperlink{structBackupFileContent}{Backup\-File\-Content} $\ast$file\-Content)
+\begin{DoxyCompactList}\small\item\em Reads local or server backup file. \end{DoxyCompactList}\item 
+void \hyperlink{SyncManager_8c_a7453f19f8804983cdb0c22338fee9701}{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff} (struct \hyperlink{structBackupFileContent}{Backup\-File\-Content} $\ast$client, unsigned int client\-Length, struct \hyperlink{structBackupFileContent}{Backup\-File\-Content} $\ast$server, unsigned int server\-Length, struct \hyperlink{structBackupFileContent}{Backup\-File\-Content} $\ast$result)
+\begin{DoxyCompactList}\small\item\em Checks the difference between two backup files. \end{DoxyCompactList}\item 
+unsigned int \hyperlink{SyncManager_8c_aa5459bcf51c8797afb70d492231b3267}{photostovis\-\_\-read\-\_\-number\-\_\-of\-\_\-lines\-\_\-in\-\_\-file} (F\-I\-L\-E $\ast$fp)
+\begin{DoxyCompactList}\small\item\em Comma-\/seperator. \end{DoxyCompactList}\item 
+\hypertarget{SyncManager_8c_a35e34d45ff97523639773a4cf3fe2696}{void \hyperlink{SyncManager_8c_a35e34d45ff97523639773a4cf3fe2696}{photostovis\-\_\-sync\-\_\-files\-\_\-to\-\_\-server} ()}\label{SyncManager_8c_a35e34d45ff97523639773a4cf3fe2696}
+
+\begin{DoxyCompactList}\small\item\em Syncronizes files between client and server. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{SyncManager_8c_afa23cff79af756f10ed8d4ce1bc00020}{\index{Sync\-Manager.\-c@{Sync\-Manager.\-c}!photostovis\-\_\-backup\-\_\-file\-\_\-getfield@{photostovis\-\_\-backup\-\_\-file\-\_\-getfield}}
+\index{photostovis\-\_\-backup\-\_\-file\-\_\-getfield@{photostovis\-\_\-backup\-\_\-file\-\_\-getfield}!SyncManager.c@{Sync\-Manager.\-c}}
+\subsubsection[{photostovis\-\_\-backup\-\_\-file\-\_\-getfield}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ photostovis\-\_\-backup\-\_\-file\-\_\-getfield (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{line, }
+\item[{int}]{num}
+\end{DoxyParamCaption}
+)}}\label{SyncManager_8c_afa23cff79af756f10ed8d4ce1bc00020}
+
+
+Reads the number of lines in a file. 
+
+Comma-\/seperator.
+
+
+\begin{DoxyParams}{Parameters}
+{\em fp} & \-: File pointer that needs to read \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+number of lines 
+\end{DoxyReturn}
+\hypertarget{SyncManager_8c_a7453f19f8804983cdb0c22338fee9701}{\index{Sync\-Manager.\-c@{Sync\-Manager.\-c}!photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff@{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff}}
+\index{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff@{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff}!SyncManager.c@{Sync\-Manager.\-c}}
+\subsubsection[{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff}]{\setlength{\rightskip}{0pt plus 5cm}void photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff (
+\begin{DoxyParamCaption}
+\item[{struct {\bf Backup\-File\-Content} $\ast$}]{client, }
+\item[{unsigned int}]{client\-Length, }
+\item[{struct {\bf Backup\-File\-Content} $\ast$}]{server, }
+\item[{unsigned int}]{server\-Length, }
+\item[{struct {\bf Backup\-File\-Content} $\ast$}]{result}
+\end{DoxyParamCaption}
+)}}\label{SyncManager_8c_a7453f19f8804983cdb0c22338fee9701}
+
+
+Checks the difference between two backup files. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em client} & \\
+\hline
+{\em client\-Length} & \\
+\hline
+{\em server} & \\
+\hline
+{\em server\-Length} & \\
+\hline
+{\em result} & \-: Files that will be uplaoded to server \\
+\hline
+\end{DoxyParams}
+\hypertarget{SyncManager_8c_abbf359d6d4f893fab87e81de67f485ac}{\index{Sync\-Manager.\-c@{Sync\-Manager.\-c}!photostovis\-\_\-read\-\_\-backup\-\_\-file@{photostovis\-\_\-read\-\_\-backup\-\_\-file}}
+\index{photostovis\-\_\-read\-\_\-backup\-\_\-file@{photostovis\-\_\-read\-\_\-backup\-\_\-file}!SyncManager.c@{Sync\-Manager.\-c}}
+\subsubsection[{photostovis\-\_\-read\-\_\-backup\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}void photostovis\-\_\-read\-\_\-backup\-\_\-file (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{backup\-File\-Path, }
+\item[{struct {\bf Backup\-File\-Content} $\ast$}]{file\-Content}
+\end{DoxyParamCaption}
+)}}\label{SyncManager_8c_abbf359d6d4f893fab87e81de67f485ac}
+
+
+Reads local or server backup file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em backup\-File\-Path} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{SyncManager_8c_aa5459bcf51c8797afb70d492231b3267}{\index{Sync\-Manager.\-c@{Sync\-Manager.\-c}!photostovis\-\_\-read\-\_\-number\-\_\-of\-\_\-lines\-\_\-in\-\_\-file@{photostovis\-\_\-read\-\_\-number\-\_\-of\-\_\-lines\-\_\-in\-\_\-file}}
+\index{photostovis\-\_\-read\-\_\-number\-\_\-of\-\_\-lines\-\_\-in\-\_\-file@{photostovis\-\_\-read\-\_\-number\-\_\-of\-\_\-lines\-\_\-in\-\_\-file}!SyncManager.c@{Sync\-Manager.\-c}}
+\subsubsection[{photostovis\-\_\-read\-\_\-number\-\_\-of\-\_\-lines\-\_\-in\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int photostovis\-\_\-read\-\_\-number\-\_\-of\-\_\-lines\-\_\-in\-\_\-file (
+\begin{DoxyParamCaption}
+\item[{F\-I\-L\-E $\ast$}]{fp}
+\end{DoxyParamCaption}
+)}}\label{SyncManager_8c_aa5459bcf51c8797afb70d492231b3267}
+
+
+Comma-\/seperator. 
+
+Reads the number of lines in a file.
+
+
+\begin{DoxyParams}{Parameters}
+{\em line} & \-: String that will be split on delimiter \\
+\hline
+{\em num} & \-: array index \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
