@@ -135,12 +135,22 @@ void photostovis_sync_files_to_server()
     }
 
     int server_file_length = photostovis_read_number_of_lines_in_file(fp);
+    printf("\n SERVERL: %d", server_file_length);
     rewind(fp);
     fclose(fp);
 
     char* client_path = "/home/global-sw-dev/Photostovis/backup.txt";
     char* client_file_name = client_path;
     FILE* client_fp = fopen(client_file_name,"r");
+
+    printf("\n\n%s\n", client_file_name);
+
+    /*printf("\n\nfile output:\n");
+    char   buffer[4096];
+        size_t nbytes;
+        while ((nbytes = fread(buffer, sizeof(char), sizeof(buffer), client_fp)) != 0)
+             fwrite(buffer, sizeof(char), nbytes, stdout);
+    printf("\n\n");*/
 
     if(client_fp == NULL)
     {

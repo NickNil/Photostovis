@@ -95,6 +95,7 @@ void photostovis_write_to_backup_file(char* path, char hash_path[65], char hash_
     fprintf(file,"%s",",");
     fprintf(file,"%s",hash_file);
     fprintf(file,"%s","\r\n");
+    fclose(file);
 }
 
 void photostovis_clear_backup_file()

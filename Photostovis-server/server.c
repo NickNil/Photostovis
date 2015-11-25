@@ -119,7 +119,7 @@ int listen_for_connection(int sockfd, char argv0[], int port){
 
 }
 
-//function for sending a .txt file
+//function for sending a file
 int send_file(int socket)
 {
     FILE *text_file;
@@ -138,7 +138,7 @@ int send_file(int socket)
     //finding file size
     if (stat("/home/global-sw-dev/Photostovis/server-backup.txt", &file_stat) < 0)
     {
-        printf("error withfile stat: %s", strerror(errno));
+        printf("error with file stat: %s", strerror(errno));
         return -1;
     }
     file_size = (int)file_stat.st_size;
@@ -149,6 +149,7 @@ int send_file(int socket)
     if(write(socket, (void *)&file_size, sizeof(int)) < 0)
     {
         printf("error sending file size: %s", strerror(errno));
+        return -1;
     }
 
     //sending file

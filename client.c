@@ -117,7 +117,7 @@ int receive_file(int socket)
     printf("packet size = %i\n", packet_size);
     printf("image size = %i\n", file_size);
 
-    received_file = fopen("/home/global-sw-dev/Photostovis/received_file.txt", "w");
+    received_file = fopen("/home/global-sw-dev/Photostovis/received_backup.txt", "w");
 
     while(receive_size < file_size)
     {
@@ -146,14 +146,14 @@ int receive_file(int socket)
     return 0;
 }
 
-void send_image(int socket)
+void send_image(int socket, char* imagepath)
 {
     FILE *picture;
     int size, packet_size, read_size, packet_index;
     char send_buffer[10240];
     packet_index = 1;
 
-    picture = fopen("/home/global-sw-dev/Photostovis/image-03.jpg", "r");
+    picture = fopen(imagepath, "r");
 
     if(picture == NULL)
     {
@@ -299,8 +299,8 @@ int photostovis_connect_to_server(char* srv, int prt)
     sendp(sockfd, hello_message);
     readp(sockfd);
 
-    //send_image(sockfd);
     receive_file(sockfd);
+
 
     printf(" Closing socket at client side\n");
     close(sockfd);
