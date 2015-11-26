@@ -151,6 +151,7 @@ void send_image(int socket, char* imagepath)
     FILE *picture;
     int size, packet_size, read_size, packet_index;
     char send_buffer[10240];
+    char *image_name;
     packet_index = 1;
 
     picture = fopen(imagepath, "r");
@@ -160,6 +161,11 @@ void send_image(int socket, char* imagepath)
         printf("error opening image\n");
     }
 
+    image_name = basename(imagepath);
+    printf("basename: %s\n", image_name);
+
+    write(socket, image_name, strlen(image_name)); //sending image name
+
     fseek(picture, 0, SEEK_END);
     size = ftell(picture);			//getting image size
     fseek(picture, 0, SEEK_SET);
@@ -168,7 +174,7 @@ void send_image(int socket, char* imagepath)
 
     //sending image size
     write(socket, (void *)&size, sizeof(int));
-    int sent;
+    //int sent;
 
     //sending image as a byte array
     while(!feof(picture))
@@ -179,11 +185,11 @@ void send_image(int socket, char* imagepath)
             packet_size = write(socket, send_buffer, read_size);
         }while(packet_size < 0);
 
-        printf("packet number: %i\n", packet_index);
+        /*printf("packet number: %i\n", packet_index);
           printf("packet size sent: %i\n", read_size);
            printf("picture size  = %i\n", size);
           sent += read_size;
-          printf("sent: %i\n", sent);
+          printf("sent: %i\n", sent);*/
 
         packet_index++;
         bzero(send_buffer, sizeof(send_buffer));
@@ -300,7 +306,10 @@ int photostovis_connect_to_server(char* srv, int prt)
     readp(sockfd);
 */
     readp(sockfd);
-    receive_file(sockfd);
+    char path[] = "/home/global-sw-dev/Photostovis/image-03.jpg";
+    printf("path: %s\n\n", path);
+    send_image(sockfd, path);
+    //receive_file(sockfd);
 
 
     printf(" Closing socket at client side\n");

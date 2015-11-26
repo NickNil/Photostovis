@@ -181,8 +181,19 @@ void receive_image(int socket)
     int read_size, write_size;
     int packet_index = 1;
 
+    char *image_name;
     char pict_array[10241];
     FILE *picture;
+
+    //receive image name
+    while(packet_size == 0)
+    {
+        packet_size = read(socket, &image_name, 256);
+    }
+
+    printf("image name: %s\n\n", image_name);
+
+    packet_size = 0;
 
     //receive image size
     while(packet_size == 0)
@@ -196,7 +207,7 @@ void receive_image(int socket)
     printf("packet size = %i\n", packet_size);
     printf("image size = %i\n", image_size);
 
-    picture = fopen("received_image.jpg", "w");
+    picture = fopen("image_name.jpg", "w");
 
     struct timeval timeout = {10,0};
 
@@ -303,8 +314,13 @@ int main(int argc, char *argv[])
 
     int newsockfd;
     while(1){
+        printf("test1");
         newsockfd = listen_for_connection(sockfd, argv[0], port);
+        printf("test2");
         sendp(newsockfd, "ACK");
+        printf("test3");
+        receive_image(newsockfd);
+        printf("test4");
         send_file(newsockfd);
         /*
         if(newsockfd >= 0){
@@ -325,7 +341,7 @@ int main(int argc, char *argv[])
 
 
     // here communication would be possible using 'newsockfd'
-    //printf(" Closing socket at Server side\n");
+    printf(" Closing socket at Server side\n");
     close(sockfd);
 
     //pause();
