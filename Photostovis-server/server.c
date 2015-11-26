@@ -182,7 +182,7 @@ void receive_image(int socket)
     int read_size, write_size;
     int packet_index = 1;
 
-    char *image_name;
+    char image_name[256];
     char pict_array[10241];
     FILE *picture;
 
