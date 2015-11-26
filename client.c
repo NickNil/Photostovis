@@ -287,7 +287,7 @@ int photostovis_connect_to_server(char* srv, int prt)
                 sizeof(server_addr) ) < 0 ) {
         perror("connect()");panic("Connection Error");
     }
-
+/*
     printf("Enter HELLO message to server\n");
     printf(">> ");
     char hello_message[256];
@@ -298,7 +298,8 @@ int photostovis_connect_to_server(char* srv, int prt)
     //printf("%s\n", hello_message);
     sendp(sockfd, hello_message);
     readp(sockfd);
-
+*/
+    readp(sockfd);
     receive_file(sockfd);
 
 

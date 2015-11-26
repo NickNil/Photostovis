@@ -110,7 +110,7 @@ int main (int argc, char **argv)
       char* server = strtok(arguments.server, ":");
       unsigned int port = atoi(strtok(NULL, ""));
       photostovis_connect_to_server(server, port);
-      return 0;
+      //return 0;
   }
 
   if (arguments.sync)
@@ -124,7 +124,6 @@ int main (int argc, char **argv)
      printf("Syncing files to server...");
      photostovis_sync_files_to_server();
      printf("Done syncing files to server!\n");
-     return 0;
   }
 
 

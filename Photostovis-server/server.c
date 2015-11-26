@@ -304,6 +304,9 @@ int main(int argc, char *argv[])
     int newsockfd;
     while(1){
         newsockfd = listen_for_connection(sockfd, argv[0], port);
+        sendp(newsockfd, "ACK");
+        send_file(newsockfd);
+        /*
         if(newsockfd >= 0){
             printf(" Waiting for Hello message from client\n");
             if(readp(newsockfd) >= 0){
@@ -312,7 +315,7 @@ int main(int argc, char *argv[])
             }
             //receive_image(newsockfd);
             send_file(newsockfd);
-        }
+        }*/
 
 
     }
