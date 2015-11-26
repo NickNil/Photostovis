@@ -114,8 +114,8 @@ int receive_file(int socket)
     }
 
     printf("packet received\n");
-    printf("packet size = %i\n", packet_size);
-    printf("image size = %i\n", file_size);
+    //printf("packet size = %i\n", packet_size);
+    //printf("image size = %i\n", file_size);
 
     received_file = fopen("/home/global-sw-dev/Photostovis/received_backup.txt", "w");
 
@@ -131,7 +131,7 @@ int receive_file(int socket)
             printf("error in read write operation\n");
         }
 
-        //printf("packet number received: %i\n", packet_index);
+       // printf("packet number received: %i\n", packet_index);
         printf("packet size: %i\n", read_size);
         printf("written file size: %i\n", write_size);
         printf("file size = %i\n", file_size);
@@ -169,7 +169,7 @@ void send_image(int socket, char* imagepath)
     fseek(picture, 0, SEEK_END);
     size = ftell(picture);			//getting image size
     fseek(picture, 0, SEEK_SET);
-    printf("picture size  = %i\n", size);
+    //printf("picture size  = %i\n", size);
     size = htonl(size); //converting size to network byte order
 
     //sending image size
@@ -185,11 +185,11 @@ void send_image(int socket, char* imagepath)
             packet_size = write(socket, send_buffer, read_size);
         }while(packet_size < 0);
 
-        /*printf("packet number: %i\n", packet_index);
-          printf("packet size sent: %i\n", read_size);
-           printf("picture size  = %i\n", size);
-          sent += read_size;
-          printf("sent: %i\n", sent);*/
+        //printf("packet number: %i\n", packet_index);
+          //printf("packet size sent: %i\n", read_size);
+           //printf("picture size  = %i\n", size);
+          //sent += read_size;
+          //printf("sent: %i\n", sent);
 
         packet_index++;
         bzero(send_buffer, sizeof(send_buffer));
@@ -305,18 +305,17 @@ int photostovis_connect_to_server(char* srv, int prt)
     sendp(sockfd, hello_message);
     readp(sockfd);
 */
-    readp(sockfd);
-    char path[] = "/home/global-sw-dev/Photostovis/image-03.jpg";
-    printf("path: %s\n\n", path);
-    send_image(sockfd, path);
+    //readp(sockfd);
+
     //receive_file(sockfd);
 
-
-    printf(" Closing socket at client side\n");
-    close(sockfd);
+    //sockt = sockfd;
+    //send_image(sockfd, "/home/global-sw-dev/Photostovis/image-03.jpg");
+    //printf(" Closing socket at client side\n");
+    //close(sockfd);
 
     //pause();
-    return 0;
+    return sockfd;
 
 }
 

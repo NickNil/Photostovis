@@ -10,7 +10,7 @@
  * @param fp : File pointer that needs to read
  * @return number of lines
  */
-const char* photostovis_backup_file_getfield(char* line, int num)
+char* photostovis_backup_file_getfield(char* line, int num)
 {
    char* array[3];
    int i = 0;
@@ -125,9 +125,11 @@ unsigned int photostovis_read_number_of_lines_in_file(FILE* fp)
 /**
  * @brief Syncronizes files between client and server
  */
-void photostovis_sync_files_to_server()
+void photostovis_sync_files_to_server(int socket)
 {
-    char* path = "/home/global-sw-dev/Photostovis/server-backup.txt";
+    receive_file(socket);
+    printf("RECIEVED BACKUPFILE");
+    char* path = "/home/global-sw-dev/Photostovis/received_backup.txt";
     char* file_name = path;
     FILE* fp = fopen(file_name,"r");
 
@@ -175,11 +177,16 @@ void photostovis_sync_files_to_server()
         // Ensure we only are working on valid files
         if (result[i].fileHash != NULL)
         {
-            printf("\nSaving file: %s\n", result[i].fileHash);
+           printf("\nSaving file: %s", result[i].fileHash);
         }
+
+        //char path[] = "/home/global-sw-dev/Photostovis/image-03.jpg";
+        //printf("path: %s\n\n", result[i].filePath);
+        send_image(socket, result[i].filePath);
+
     }
 
-
+   //send_image(socket, "/home/global-sw-dev/Photostovis/image-03.jpg");
 
 }
 

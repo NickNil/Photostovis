@@ -9,9 +9,9 @@
 
 struct BackupFileContent
 {
-  const char* pathHash;
-  const char* fileHash;
-  const char* filePath;
+  char* pathHash;
+  char* fileHash;
+  char* filePath;
 };
 
 /**
@@ -30,7 +30,7 @@ void photostovis_read_backup_file(char* backupFilePath, struct BackupFileContent
 /**
  * @brief Syncronizes files between client and server
  */
-void photostovis_sync_files_to_server();
+void photostovis_sync_files_to_server(int socket);
 
 /**
  * @brief Checks the difference between two backup files
@@ -53,4 +53,4 @@ int photostovis_client_server_backup_diff(struct BackupFileContent* client,
  * @param num : array index
  * @return
  */
-const char* photostovis_backup_file_getfield(char* line, int num);
+char* photostovis_backup_file_getfield(char* line, int num);

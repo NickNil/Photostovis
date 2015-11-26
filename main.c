@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <argp.h>
 #include "SyncManager.h"
+#include "FileManager.h"
 #include "client.h"
 #include <stdbool.h>
 #include <string.h>
+#include <unistd.h>
 
 const char *argp_program_version = "photostovis-0.0.1";
 const char *argp_program_bug_address = "<bugss@photostovis.com>";
@@ -18,6 +20,7 @@ static char args_doc[] = "ARG1 [STRING...]";
 static struct argp_option options[] = {
   {"sync",   'c', "sync",  0, "Sync files to server" },
   {"server",   's', "server",  0, "Server IP:Port, 127.0.0.1:8000" },
+  {"path",   'p', "path",  0, "Backup directory" },
   {"abort",    OPT_ABORT, 0, 0, "Abort before showing any output"},
 
   { 0 }
@@ -32,6 +35,7 @@ struct arguments
   char *server;            /* file arg to ‘--output’ */
   int repeat_count;             /* count arg to ‘--repeat’ */
   char* sync;
+  char* backup_file_path;
 };
 
 /* Parse a single option. */
@@ -44,6 +48,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
   switch (key)
     {
+  case 'p' :
+    arguments->backup_file_path = arg;
+    break;
     case 'c' :
       arguments->sync = arg ? atoi (arg) : 0;
       break;
@@ -105,11 +112,14 @@ int main (int argc, char **argv)
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
   // This means, conncet to server, should also chceck for sync argument
+  int socket;
   if (strcmp(arguments.server,"-"))
   {
       char* server = strtok(arguments.server, ":");
       unsigned int port = atoi(strtok(NULL, ""));
-      photostovis_connect_to_server(server, port);
+
+      socket = photostovis_connect_to_server(server, port);
+      //printf("SOCKET %d", socket);
       //return 0;
   }
 
@@ -122,10 +132,11 @@ int main (int argc, char **argv)
      const unsigned int pathLength = strlen(path);
      photostovis_get_filenames_from_client(path, pathLength);
      printf("Syncing files to server...");
-     photostovis_sync_files_to_server();
+     photostovis_sync_files_to_server(socket);
      printf("Done syncing files to server!\n");
   }
 
+  close(socket);
 
   return 0;
 }

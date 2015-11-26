@@ -97,9 +97,9 @@ void photostovis_write_to_backup_file(char* path, char hash_path[65], char hash_
 {
     char* backup_path = "/home/global-sw-dev/Photostovis/backup.txt";
     FILE* file = fopen(backup_path, "a");
-    fprintf(file,"%s","\"");
+    //fprintf(file,"%s","\"");
     fprintf(file,"%s",path);
-    fprintf(file,"%s","\"");
+    //fprintf(file,"%s","\"");
     fprintf(file,"%s",",");
     fprintf(file,"%s",hash_path);
     fprintf(file,"%s",",");

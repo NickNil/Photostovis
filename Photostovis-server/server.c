@@ -167,6 +167,7 @@ int send_file(int socket)
 
         bzero(send_buffer, sizeof(send_buffer));
     }
+
     printf("file hopefully successfully sent");
 
 
@@ -192,6 +193,7 @@ void receive_image(int socket)
     }
 
     printf("image name: %s\n\n", image_name);
+/*
 
     packet_size = 0;
 
@@ -207,7 +209,19 @@ void receive_image(int socket)
     printf("packet size = %i\n", packet_size);
     printf("image size = %i\n", image_size);
 
-    picture = fopen("image_name.jpg", "w");
+
+    char* base_path = "/home/global-sw-dev/Photostovis/backup-pictures/";
+    char new_path[strlen(base_path)+strlen(image_name)+1];
+    strcpy(new_path, base_path);
+    strcpy(new_path, image_name);
+    printf("\nNEW PATH: %s", base_path);
+
+
+    picture = fopen("new_path.jpg", "w");
+    if (picture == NULL)
+    {
+        printf("ERROR LOADING IMAGE");
+    }
 
     struct timeval timeout = {10,0};
 
@@ -253,7 +267,10 @@ void receive_image(int socket)
         }
 
     }
+
     fclose(picture);
+    */
+
     printf("image (hopefully) successfully received :D\n\n");
 }
 
@@ -314,14 +331,15 @@ int main(int argc, char *argv[])
 
     int newsockfd;
     while(1){
-        printf("test1");
+        //printf("test1");
         newsockfd = listen_for_connection(sockfd, argv[0], port);
-        printf("test2");
-        sendp(newsockfd, "ACK");
-        printf("test3");
-        receive_image(newsockfd);
+        //printf("test2");
+        //sendp(newsockfd, "ACK");
+        //printf("test3");
+        //receive_image(newsockfd);
         printf("test4");
         send_file(newsockfd);
+        receive_image(newsockfd);
         /*
         if(newsockfd >= 0){
             printf(" Waiting for Hello message from client\n");
