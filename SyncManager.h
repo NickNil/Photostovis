@@ -40,11 +40,12 @@ void photostovis_sync_files_to_server();
  * @param serverLength
  * @param result : Files that will be uplaoded to server
  */
-void photostovis_client_server_backup_diff(struct BackupFileContent* client,
+int photostovis_client_server_backup_diff(struct BackupFileContent* client,
                                                                 unsigned int clientLength,
                                                                 struct BackupFileContent* server,
                                                                 unsigned int serverLength,
-                                                                struct BackupFileContent* result);
+                                                                struct BackupFileContent* result,
+                                                                int getResult);
 
 /**
  * @brief Comma-seperator

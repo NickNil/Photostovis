@@ -22,12 +22,6 @@ void photostovis_get_filenames_from_client(char* const currentPath, const unsign
             photostovis_hash_file_path_on_client(fullpath, hash_path);
             char* newpath = fullpath;
 
-            //Add hash_content, hash_path and newpath to the backup.txt file.Append or Depend.
-
-            printf("\n FULLPATH: %s", newpath);
-            printf("\n HASHPATH: %s", hash_path);
-            printf("\n HASHCONTENT: %s", hash_content);
-
             photostovis_write_to_backup_file(newpath, hash_path, hash_content);
         }
     }
@@ -94,7 +88,7 @@ void photostovis_write_to_backup_file(char* path, char hash_path[65], char hash_
     fprintf(file,"%s",hash_path);
     fprintf(file,"%s",",");
     fprintf(file,"%s",hash_file);
-    fprintf(file,"%s","\r\n");
+    fprintf(file,"%s","\n");
     fclose(file);
 }
 

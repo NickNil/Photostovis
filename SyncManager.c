@@ -42,8 +42,6 @@ void photostovis_read_backup_file(char* backupFilePath, struct BackupFileContent
    char line[1024];
    int counter = 0;
 
-   printf("\n PATH: %s", backupFilePath);
-
    while (fgets(line, 1024, fp))
    {
        char* tmp = strdup(line);
@@ -51,7 +49,7 @@ void photostovis_read_backup_file(char* backupFilePath, struct BackupFileContent
        temp_line.filePath = photostovis_backup_file_getfield(tmp, 0);
        temp_line.pathHash = photostovis_backup_file_getfield(tmp, 1);
        temp_line.fileHash = photostovis_backup_file_getfield(tmp, 2);
-       printf("\n FULLPATH: %s", tmp);
+       //printf("\n FULLPATH: %s", tmp);
        fileContent[counter] = temp_line;
        counter++;
    }
@@ -68,14 +66,14 @@ void photostovis_read_backup_file(char* backupFilePath, struct BackupFileContent
  * @param serverLength
  * @param result : Files that will be uplaoded to server
  */
-void photostovis_client_server_backup_diff(struct BackupFileContent* client,
+int photostovis_client_server_backup_diff(struct BackupFileContent* client,
                                                                 unsigned int clientLength,
                                                                 struct BackupFileContent* server,
                                                                 unsigned int serverLength,
-                                                                struct BackupFileContent* result)
+                                                                struct BackupFileContent* result,
+                                                                int getResult)
 {
     int equal;
-
     unsigned int i;
     unsigned int j;
     unsigned int k = 0;
@@ -85,6 +83,7 @@ void photostovis_client_server_backup_diff(struct BackupFileContent* client,
         equal = 0;
         for(j = 0; j < serverLength; j++)
         {
+            //printf("\n %s %s %d %d", client[i].filePath, server[j].filePath, !strcmp(client[i].pathHash, server[j].pathHash), !strcmp(client[i].fileHash, server[j].fileHash));
             if (!strcmp(client[i].pathHash, server[j].pathHash) &&
                 !strcmp(client[i].fileHash, server[j].fileHash))
             {
@@ -94,10 +93,14 @@ void photostovis_client_server_backup_diff(struct BackupFileContent* client,
 
         if (equal == 0)
         {
-            result[k] = client[i];
+            if(getResult)
+            {
+                result[k] = client[i];
+            }
             k++;
         }
     }
+    return k;
 }
 
 /**
@@ -135,7 +138,6 @@ void photostovis_sync_files_to_server()
     }
 
     int server_file_length = photostovis_read_number_of_lines_in_file(fp);
-    printf("\n SERVERL: %d", server_file_length);
     rewind(fp);
     fclose(fp);
 
@@ -143,14 +145,6 @@ void photostovis_sync_files_to_server()
     char* client_file_name = client_path;
     FILE* client_fp = fopen(client_file_name,"r");
 
-    printf("\n\n%s\n", client_file_name);
-
-    /*printf("\n\nfile output:\n");
-    char   buffer[4096];
-        size_t nbytes;
-        while ((nbytes = fread(buffer, sizeof(char), sizeof(buffer), client_fp)) != 0)
-             fwrite(buffer, sizeof(char), nbytes, stdout);
-    printf("\n\n");*/
 
     if(client_fp == NULL)
     {
@@ -159,31 +153,24 @@ void photostovis_sync_files_to_server()
     }
 
     int client_file_length = photostovis_read_number_of_lines_in_file(client_fp);
-    printf("\n CLIENTL: %d", client_file_length);
+    //printf("\n CLIENTL: %d", client_file_length);
     rewind(client_fp);
     fclose(client_fp);
 
     struct BackupFileContent server[server_file_length];
     photostovis_read_backup_file(path, server);
-    int i;
-    for(i = 0; i < server_file_length; i++)
-    {
-       //printf("\n SERVER: %d", Server[i].lineNumber);
-    }
 
     struct BackupFileContent client[client_file_length];
     photostovis_read_backup_file(client_path, client);
 
-    for(i = 0; i < client_file_length; i++)
-    {
-        printf("\n CLIENT: %s", client[i].filePath);
-    }
 
-    struct BackupFileContent result[client_file_length];
-    photostovis_client_server_backup_diff(client, client_file_length, server, server_file_length, result);
+    int size = photostovis_client_server_backup_diff(client, client_file_length, server, server_file_length, NULL, 0);
+    //printf("\n SIZE : %d", size);
+    struct BackupFileContent result[size];
+    photostovis_client_server_backup_diff(client, client_file_length, server, server_file_length, result, 1);
 
-
-    for(i = 0; i < client_file_length; i++)
+    int i;
+    for(i = 0; i < size; i++)
     {
         // Ensure we only are working on valid files
         if (result[i].fileHash != NULL)
