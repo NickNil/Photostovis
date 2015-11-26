@@ -69,7 +69,7 @@ int photostovis_hash_file_content_on_client(char* fullpath, char output[65])
     return 0;
 }
 
-int photostovis_hash_file_path_on_client(char* path, char output[65])
+void photostovis_hash_file_path_on_client(char* path, char output[65])
 {
     unsigned char buf[SHA256_BLOCK_SIZE];
     SHA256_CTX ctx;
@@ -79,7 +79,6 @@ int photostovis_hash_file_path_on_client(char* path, char output[65])
     sha256_final(&ctx, buf);
 
     sha256_hash_string(buf, output);
-    return 0;
 }
 
 void sha256_hash_string (char hash[SHA256_BLOCK_SIZE], char outputBuffer[65])

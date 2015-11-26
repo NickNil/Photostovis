@@ -1,0 +1,125 @@
+\hypertarget{FileManager_8c}{\section{File\-Manager.\-c File Reference}
+\label{FileManager_8c}\index{File\-Manager.\-c@{File\-Manager.\-c}}
+}
+{\ttfamily \#include \char`\"{}File\-Manager.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}assert.\-h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{FileManager_8c_a37db2f661f9aaf7f6aa42e3e3e23c47d}{photostovis\-\_\-get\-\_\-filenames\-\_\-from\-\_\-client} (char $\ast$const current\-Path, const unsigned int current\-Path\-Len)
+\begin{DoxyCompactList}\small\item\em This function gets the filenames from the photo-\/folder on the client. If multiple folders are located inside the photo-\/folder, the filenames are gathered from these as well. \end{DoxyCompactList}\item 
+int \hyperlink{FileManager_8c_ac1d6f2ae4f853e4948878694863e6e6d}{photostovis\-\_\-hash\-\_\-file\-\_\-content\-\_\-on\-\_\-client} (char $\ast$fullpath, char output\mbox{[}65\mbox{]})
+\begin{DoxyCompactList}\small\item\em Hashes the file content of the current file. \end{DoxyCompactList}\item 
+void \hyperlink{FileManager_8c_aca447c6100e54142e7ce4c4d1b35e293}{photostovis\-\_\-hash\-\_\-file\-\_\-path\-\_\-on\-\_\-client} (char $\ast$path, char output\mbox{[}65\mbox{]})
+\begin{DoxyCompactList}\small\item\em Hashes the file path of the current file. \end{DoxyCompactList}\item 
+void \hyperlink{FileManager_8c_ab6d88c3227e2ac57241b9f95be289fd3}{sha256\-\_\-hash\-\_\-string} (char hash\mbox{[}S\-H\-A256\-\_\-\-B\-L\-O\-C\-K\-\_\-\-S\-I\-Z\-E\mbox{]}, char output\-Buffer\mbox{[}65\mbox{]})
+\begin{DoxyCompactList}\small\item\em Converts H\-E\-X values to string. \end{DoxyCompactList}\item 
+void \hyperlink{FileManager_8c_a54a8fc9e09df0be8e138b4fa72347f8f}{photostovis\-\_\-write\-\_\-to\-\_\-backup\-\_\-file} (char $\ast$path, char hash\-\_\-path\mbox{[}65\mbox{]}, char hash\-\_\-file\mbox{[}65\mbox{]})
+\begin{DoxyCompactList}\small\item\em Writes the fullpath, filepath hash and filecontent hash to the backup.\-txt file on client. Appends to this file. \end{DoxyCompactList}\item 
+\hypertarget{FileManager_8c_ad2f4bd46f1e4ecca179b0e19bc0eb5d0}{void \hyperlink{FileManager_8c_ad2f4bd46f1e4ecca179b0e19bc0eb5d0}{photostovis\-\_\-clear\-\_\-backup\-\_\-file} ()}\label{FileManager_8c_ad2f4bd46f1e4ecca179b0e19bc0eb5d0}
+
+\begin{DoxyCompactList}\small\item\em Deletes the current content of the backup.\-txt file on client. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{FileManager_8c_a37db2f661f9aaf7f6aa42e3e3e23c47d}{\index{File\-Manager.\-c@{File\-Manager.\-c}!photostovis\-\_\-get\-\_\-filenames\-\_\-from\-\_\-client@{photostovis\-\_\-get\-\_\-filenames\-\_\-from\-\_\-client}}
+\index{photostovis\-\_\-get\-\_\-filenames\-\_\-from\-\_\-client@{photostovis\-\_\-get\-\_\-filenames\-\_\-from\-\_\-client}!FileManager.c@{File\-Manager.\-c}}
+\subsubsection[{photostovis\-\_\-get\-\_\-filenames\-\_\-from\-\_\-client}]{\setlength{\rightskip}{0pt plus 5cm}void photostovis\-\_\-get\-\_\-filenames\-\_\-from\-\_\-client (
+\begin{DoxyParamCaption}
+\item[{char $\ast$const}]{current\-Path, }
+\item[{const unsigned int}]{current\-Path\-Len}
+\end{DoxyParamCaption}
+)}}\label{FileManager_8c_a37db2f661f9aaf7f6aa42e3e3e23c47d}
+
+
+This function gets the filenames from the photo-\/folder on the client. If multiple folders are located inside the photo-\/folder, the filenames are gathered from these as well. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em current\-Path} & \-: The current path for the photo-\/files. \\
+\hline
+{\em current\-Path\-Len} & \-: The current length of the path. \\
+\hline
+\end{DoxyParams}
+\hypertarget{FileManager_8c_ac1d6f2ae4f853e4948878694863e6e6d}{\index{File\-Manager.\-c@{File\-Manager.\-c}!photostovis\-\_\-hash\-\_\-file\-\_\-content\-\_\-on\-\_\-client@{photostovis\-\_\-hash\-\_\-file\-\_\-content\-\_\-on\-\_\-client}}
+\index{photostovis\-\_\-hash\-\_\-file\-\_\-content\-\_\-on\-\_\-client@{photostovis\-\_\-hash\-\_\-file\-\_\-content\-\_\-on\-\_\-client}!FileManager.c@{File\-Manager.\-c}}
+\subsubsection[{photostovis\-\_\-hash\-\_\-file\-\_\-content\-\_\-on\-\_\-client}]{\setlength{\rightskip}{0pt plus 5cm}int photostovis\-\_\-hash\-\_\-file\-\_\-content\-\_\-on\-\_\-client (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{fullpath, }
+\item[{char}]{output\mbox{[}65\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{FileManager_8c_ac1d6f2ae4f853e4948878694863e6e6d}
+
+
+Hashes the file content of the current file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em fullpath} & \-: The full path to the image-\/file. \\
+\hline
+{\em output} & \-: A reference for file content hash. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\-: 0 if success, -\/1 if error. 
+\end{DoxyReturn}
+\hypertarget{FileManager_8c_aca447c6100e54142e7ce4c4d1b35e293}{\index{File\-Manager.\-c@{File\-Manager.\-c}!photostovis\-\_\-hash\-\_\-file\-\_\-path\-\_\-on\-\_\-client@{photostovis\-\_\-hash\-\_\-file\-\_\-path\-\_\-on\-\_\-client}}
+\index{photostovis\-\_\-hash\-\_\-file\-\_\-path\-\_\-on\-\_\-client@{photostovis\-\_\-hash\-\_\-file\-\_\-path\-\_\-on\-\_\-client}!FileManager.c@{File\-Manager.\-c}}
+\subsubsection[{photostovis\-\_\-hash\-\_\-file\-\_\-path\-\_\-on\-\_\-client}]{\setlength{\rightskip}{0pt plus 5cm}void photostovis\-\_\-hash\-\_\-file\-\_\-path\-\_\-on\-\_\-client (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{path, }
+\item[{char}]{output\mbox{[}65\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{FileManager_8c_aca447c6100e54142e7ce4c4d1b35e293}
+
+
+Hashes the file path of the current file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & \-: The path to the file. \\
+\hline
+{\em output} & \-: A reference for file path hash. \\
+\hline
+\end{DoxyParams}
+\hypertarget{FileManager_8c_a54a8fc9e09df0be8e138b4fa72347f8f}{\index{File\-Manager.\-c@{File\-Manager.\-c}!photostovis\-\_\-write\-\_\-to\-\_\-backup\-\_\-file@{photostovis\-\_\-write\-\_\-to\-\_\-backup\-\_\-file}}
+\index{photostovis\-\_\-write\-\_\-to\-\_\-backup\-\_\-file@{photostovis\-\_\-write\-\_\-to\-\_\-backup\-\_\-file}!FileManager.c@{File\-Manager.\-c}}
+\subsubsection[{photostovis\-\_\-write\-\_\-to\-\_\-backup\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}void photostovis\-\_\-write\-\_\-to\-\_\-backup\-\_\-file (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{path, }
+\item[{char}]{hash\-\_\-path\mbox{[}65\mbox{]}, }
+\item[{char}]{hash\-\_\-file\mbox{[}65\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{FileManager_8c_a54a8fc9e09df0be8e138b4fa72347f8f}
+
+
+Writes the fullpath, filepath hash and filecontent hash to the backup.\-txt file on client. Appends to this file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & \-: The full path to the file. \\
+\hline
+{\em hash\-\_\-path} & \-: The hashed path to the file. \\
+\hline
+{\em hash\-\_\-file} & \-: The hashed file content. \\
+\hline
+\end{DoxyParams}
+\hypertarget{FileManager_8c_ab6d88c3227e2ac57241b9f95be289fd3}{\index{File\-Manager.\-c@{File\-Manager.\-c}!sha256\-\_\-hash\-\_\-string@{sha256\-\_\-hash\-\_\-string}}
+\index{sha256\-\_\-hash\-\_\-string@{sha256\-\_\-hash\-\_\-string}!FileManager.c@{File\-Manager.\-c}}
+\subsubsection[{sha256\-\_\-hash\-\_\-string}]{\setlength{\rightskip}{0pt plus 5cm}void sha256\-\_\-hash\-\_\-string (
+\begin{DoxyParamCaption}
+\item[{char}]{hash\mbox{[}\-S\-H\-A256\-\_\-\-B\-L\-O\-C\-K\-\_\-\-S\-I\-Z\-E\mbox{]}, }
+\item[{char}]{output\-Buffer\mbox{[}65\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{FileManager_8c_ab6d88c3227e2ac57241b9f95be289fd3}
+
+
+Converts H\-E\-X values to string. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hash} & \-: The hash in H\-E\-X values \\
+\hline
+{\em output\-Buffer} & \-: A reference to the hash as char. \\
+\hline
+\end{DoxyParams}

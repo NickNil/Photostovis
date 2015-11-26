@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['syncmanager_2ec',['SyncManager.c',['../SyncManager_8c.html',1,'']]]
+  ['filemanager_2ec',['FileManager.c',['../FileManager_8c.html',1,'']]]
 ];

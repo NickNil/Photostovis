@@ -19,7 +19,7 @@ const char $\ast$ \hyperlink{SyncManager_8c_afa23cff79af756f10ed8d4ce1bc00020}{p
 \begin{DoxyCompactList}\small\item\em Reads the number of lines in a file. \end{DoxyCompactList}\item 
 void \hyperlink{SyncManager_8c_abbf359d6d4f893fab87e81de67f485ac}{photostovis\-\_\-read\-\_\-backup\-\_\-file} (char $\ast$backup\-File\-Path, struct \hyperlink{structBackupFileContent}{Backup\-File\-Content} $\ast$file\-Content)
 \begin{DoxyCompactList}\small\item\em Reads local or server backup file. \end{DoxyCompactList}\item 
-void \hyperlink{SyncManager_8c_a7453f19f8804983cdb0c22338fee9701}{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff} (struct \hyperlink{structBackupFileContent}{Backup\-File\-Content} $\ast$client, unsigned int client\-Length, struct \hyperlink{structBackupFileContent}{Backup\-File\-Content} $\ast$server, unsigned int server\-Length, struct \hyperlink{structBackupFileContent}{Backup\-File\-Content} $\ast$result)
+int \hyperlink{SyncManager_8c_a028c2d7e8c8eaa9c4f1b00445206d516}{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff} (struct \hyperlink{structBackupFileContent}{Backup\-File\-Content} $\ast$client, unsigned int client\-Length, struct \hyperlink{structBackupFileContent}{Backup\-File\-Content} $\ast$server, unsigned int server\-Length, struct \hyperlink{structBackupFileContent}{Backup\-File\-Content} $\ast$result, int get\-Result)
 \begin{DoxyCompactList}\small\item\em Checks the difference between two backup files. \end{DoxyCompactList}\item 
 unsigned int \hyperlink{SyncManager_8c_aa5459bcf51c8797afb70d492231b3267}{photostovis\-\_\-read\-\_\-number\-\_\-of\-\_\-lines\-\_\-in\-\_\-file} (F\-I\-L\-E $\ast$fp)
 \begin{DoxyCompactList}\small\item\em Comma-\/seperator. \end{DoxyCompactList}\item 
@@ -51,17 +51,18 @@ Comma-\/seperator.
 \begin{DoxyReturn}{Returns}
 number of lines 
 \end{DoxyReturn}
-\hypertarget{SyncManager_8c_a7453f19f8804983cdb0c22338fee9701}{\index{Sync\-Manager.\-c@{Sync\-Manager.\-c}!photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff@{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff}}
+\hypertarget{SyncManager_8c_a028c2d7e8c8eaa9c4f1b00445206d516}{\index{Sync\-Manager.\-c@{Sync\-Manager.\-c}!photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff@{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff}}
 \index{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff@{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff}!SyncManager.c@{Sync\-Manager.\-c}}
-\subsubsection[{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff}]{\setlength{\rightskip}{0pt plus 5cm}void photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff (
+\subsubsection[{photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff}]{\setlength{\rightskip}{0pt plus 5cm}int photostovis\-\_\-client\-\_\-server\-\_\-backup\-\_\-diff (
 \begin{DoxyParamCaption}
 \item[{struct {\bf Backup\-File\-Content} $\ast$}]{client, }
 \item[{unsigned int}]{client\-Length, }
 \item[{struct {\bf Backup\-File\-Content} $\ast$}]{server, }
 \item[{unsigned int}]{server\-Length, }
-\item[{struct {\bf Backup\-File\-Content} $\ast$}]{result}
+\item[{struct {\bf Backup\-File\-Content} $\ast$}]{result, }
+\item[{int}]{get\-Result}
 \end{DoxyParamCaption}
-)}}\label{SyncManager_8c_a7453f19f8804983cdb0c22338fee9701}
+)}}\label{SyncManager_8c_a028c2d7e8c8eaa9c4f1b00445206d516}
 
 
 Checks the difference between two backup files. 

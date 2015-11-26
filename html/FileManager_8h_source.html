@@ -83,23 +83,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">FileManager.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;string.h&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;dirent.h&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;sha256.h&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keywordtype">void</span> photostovis_get_filenames_from_client(<span class="keywordtype">char</span>* <span class="keyword">const</span> currentPath, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> currentPathLen);</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keywordtype">int</span> photostovis_hash_file_content_on_client(<span class="keywordtype">char</span>* fullpath, <span class="keywordtype">char</span> output[65]);</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keywordtype">int</span> photostovis_hash_file_path_on_client(<span class="keywordtype">char</span>* path, <span class="keywordtype">char</span> output[65]);</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keywordtype">void</span> sha256_hash_string (<span class="keywordtype">char</span> hash[SHA256_BLOCK_SIZE], <span class="keywordtype">char</span> outputBuffer[65]);</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keywordtype">void</span> photostovis_write_to_backup_file(<span class="keywordtype">char</span>* path, <span class="keywordtype">char</span> hash_path[65], <span class="keywordtype">char</span> hash_file[65]);</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keywordtype">void</span> photostovis_clear_backup_file();</div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;</div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;string.h&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;dirent.h&gt;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;sha256.h&gt;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keywordtype">void</span> <a class="code" href="FileManager_8c.html#a37db2f661f9aaf7f6aa42e3e3e23c47d">photostovis_get_filenames_from_client</a>(<span class="keywordtype">char</span>* <span class="keyword">const</span> currentPath, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> currentPathLen);</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keywordtype">int</span> <a class="code" href="FileManager_8c.html#ac1d6f2ae4f853e4948878694863e6e6d">photostovis_hash_file_content_on_client</a>(<span class="keywordtype">char</span>* fullpath, <span class="keywordtype">char</span> output[65]);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keywordtype">void</span> <a class="code" href="FileManager_8c.html#aca447c6100e54142e7ce4c4d1b35e293">photostovis_hash_file_path_on_client</a>(<span class="keywordtype">char</span>* path, <span class="keywordtype">char</span> output[65]);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keywordtype">void</span> <a class="code" href="FileManager_8c.html#ab6d88c3227e2ac57241b9f95be289fd3">sha256_hash_string</a> (<span class="keywordtype">char</span> hash[SHA256_BLOCK_SIZE], <span class="keywordtype">char</span> outputBuffer[65]);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keywordtype">void</span> <a class="code" href="FileManager_8c.html#a54a8fc9e09df0be8e138b4fa72347f8f">photostovis_write_to_backup_file</a>(<span class="keywordtype">char</span>* path, <span class="keywordtype">char</span> hash_path[65], <span class="keywordtype">char</span> hash_file[65]);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keywordtype">void</span> <a class="code" href="FileManager_8c.html#ad2f4bd46f1e4ecca179b0e19bc0eb5d0">photostovis_clear_backup_file</a>();</div>
+<div class="ttc" id="FileManager_8c_html_a37db2f661f9aaf7f6aa42e3e3e23c47d"><div class="ttname"><a href="FileManager_8c.html#a37db2f661f9aaf7f6aa42e3e3e23c47d">photostovis_get_filenames_from_client</a></div><div class="ttdeci">void photostovis_get_filenames_from_client(char *const currentPath, const unsigned int currentPathLen)</div><div class="ttdoc">This function gets the filenames from the photo-folder on the client. If multiple folders are located...</div><div class="ttdef"><b>Definition:</b> FileManager.c:4</div></div>
+<div class="ttc" id="FileManager_8c_html_a54a8fc9e09df0be8e138b4fa72347f8f"><div class="ttname"><a href="FileManager_8c.html#a54a8fc9e09df0be8e138b4fa72347f8f">photostovis_write_to_backup_file</a></div><div class="ttdeci">void photostovis_write_to_backup_file(char *path, char hash_path[65], char hash_file[65])</div><div class="ttdoc">Writes the fullpath, filepath hash and filecontent hash to the backup.txt file on client...</div><div class="ttdef"><b>Definition:</b> FileManager.c:96</div></div>
+<div class="ttc" id="FileManager_8c_html_aca447c6100e54142e7ce4c4d1b35e293"><div class="ttname"><a href="FileManager_8c.html#aca447c6100e54142e7ce4c4d1b35e293">photostovis_hash_file_path_on_client</a></div><div class="ttdeci">void photostovis_hash_file_path_on_client(char *path, char output[65])</div><div class="ttdoc">Hashes the file path of the current file. </div><div class="ttdef"><b>Definition:</b> FileManager.c:72</div></div>
+<div class="ttc" id="FileManager_8c_html_ab6d88c3227e2ac57241b9f95be289fd3"><div class="ttname"><a href="FileManager_8c.html#ab6d88c3227e2ac57241b9f95be289fd3">sha256_hash_string</a></div><div class="ttdeci">void sha256_hash_string(char hash[SHA256_BLOCK_SIZE], char outputBuffer[65])</div><div class="ttdoc">Converts HEX values to string. </div><div class="ttdef"><b>Definition:</b> FileManager.c:84</div></div>
+<div class="ttc" id="FileManager_8c_html_ac1d6f2ae4f853e4948878694863e6e6d"><div class="ttname"><a href="FileManager_8c.html#ac1d6f2ae4f853e4948878694863e6e6d">photostovis_hash_file_content_on_client</a></div><div class="ttdeci">int photostovis_hash_file_content_on_client(char *fullpath, char output[65])</div><div class="ttdoc">Hashes the file content of the current file. </div><div class="ttdef"><b>Definition:</b> FileManager.c:48</div></div>
+<div class="ttc" id="FileManager_8c_html_ad2f4bd46f1e4ecca179b0e19bc0eb5d0"><div class="ttname"><a href="FileManager_8c.html#ad2f4bd46f1e4ecca179b0e19bc0eb5d0">photostovis_clear_backup_file</a></div><div class="ttdeci">void photostovis_clear_backup_file()</div><div class="ttdoc">Deletes the current content of the backup.txt file on client. </div><div class="ttdef"><b>Definition:</b> FileManager.c:111</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Nov 23 2015 15:17:46 for Photostovis client by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Nov 26 2015 14:09:36 for Photostovis client by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

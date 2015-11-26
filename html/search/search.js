@@ -7,10 +7,10 @@
 
 var indexSectionsWithContent =
 {
-  0: "abps",
+  0: "abfps",
   1: "abs",
-  2: "s",
-  3: "p"
+  2: "fs",
+  3: "ps"
 };
 
 var indexSectionNames =

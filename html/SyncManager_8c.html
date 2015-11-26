@@ -106,9 +106,9 @@ Functions</h2></td></tr>
 <tr class="memitem:abbf359d6d4f893fab87e81de67f485ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SyncManager_8c.html#abbf359d6d4f893fab87e81de67f485ac">photostovis_read_backup_file</a> (char *backupFilePath, struct <a class="el" href="structBackupFileContent.html">BackupFileContent</a> *fileContent)</td></tr>
 <tr class="memdesc:abbf359d6d4f893fab87e81de67f485ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads local or server backup file.  <a href="#abbf359d6d4f893fab87e81de67f485ac">More...</a><br/></td></tr>
 <tr class="separator:abbf359d6d4f893fab87e81de67f485ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7453f19f8804983cdb0c22338fee9701"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SyncManager_8c.html#a7453f19f8804983cdb0c22338fee9701">photostovis_client_server_backup_diff</a> (struct <a class="el" href="structBackupFileContent.html">BackupFileContent</a> *client, unsigned int clientLength, struct <a class="el" href="structBackupFileContent.html">BackupFileContent</a> *server, unsigned int serverLength, struct <a class="el" href="structBackupFileContent.html">BackupFileContent</a> *result)</td></tr>
-<tr class="memdesc:a7453f19f8804983cdb0c22338fee9701"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the difference between two backup files.  <a href="#a7453f19f8804983cdb0c22338fee9701">More...</a><br/></td></tr>
-<tr class="separator:a7453f19f8804983cdb0c22338fee9701"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a028c2d7e8c8eaa9c4f1b00445206d516"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SyncManager_8c.html#a028c2d7e8c8eaa9c4f1b00445206d516">photostovis_client_server_backup_diff</a> (struct <a class="el" href="structBackupFileContent.html">BackupFileContent</a> *client, unsigned int clientLength, struct <a class="el" href="structBackupFileContent.html">BackupFileContent</a> *server, unsigned int serverLength, struct <a class="el" href="structBackupFileContent.html">BackupFileContent</a> *result, int getResult)</td></tr>
+<tr class="memdesc:a028c2d7e8c8eaa9c4f1b00445206d516"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the difference between two backup files.  <a href="#a028c2d7e8c8eaa9c4f1b00445206d516">More...</a><br/></td></tr>
+<tr class="separator:a028c2d7e8c8eaa9c4f1b00445206d516"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5459bcf51c8797afb70d492231b3267"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SyncManager_8c.html#aa5459bcf51c8797afb70d492231b3267">photostovis_read_number_of_lines_in_file</a> (FILE *fp)</td></tr>
 <tr class="memdesc:aa5459bcf51c8797afb70d492231b3267"><td class="mdescLeft">&#160;</td><td class="mdescRight">Comma-seperator.  <a href="#aa5459bcf51c8797afb70d492231b3267">More...</a><br/></td></tr>
 <tr class="separator:aa5459bcf51c8797afb70d492231b3267"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,12 +154,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Sync
 
 </div>
 </div>
-<a class="anchor" id="a7453f19f8804983cdb0c22338fee9701"></a>
+<a class="anchor" id="a028c2d7e8c8eaa9c4f1b00445206d516"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void photostovis_client_server_backup_diff </td>
+          <td class="memname">int photostovis_client_server_backup_diff </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structBackupFileContent.html">BackupFileContent</a> *&#160;</td>
           <td class="paramname"><em>client</em>, </td>
@@ -186,7 +186,13 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Sync
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">struct <a class="el" href="structBackupFileContent.html">BackupFileContent</a> *&#160;</td>
-          <td class="paramname"><em>result</em>&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>getResult</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -274,7 +280,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Sync
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Nov 23 2015 15:17:46 for Photostovis client by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Nov 26 2015 14:09:36 for Photostovis client by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
