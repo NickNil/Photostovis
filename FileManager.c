@@ -1,9 +1,11 @@
 #include "FileManager.h"
+#include "assert.h"
 
 void photostovis_get_filenames_from_client(char* const currentPath, const unsigned int currentPathLen)
 {
     DIR *dirp;
-    const char* path = currentPath;//"/home/global-sw-dev/Photostovis/pictures/";
+    char* path = currentPath;
+    assert(path[currentPathLen-1]=='/');
     struct dirent *dp;
     char * filename;
     char * fullpath;
@@ -12,19 +14,34 @@ void photostovis_get_filenames_from_client(char* const currentPath, const unsign
     {
         if(strlen(dp->d_name) > 2)
         {
-            filename = dp->d_name;
-            fullpath = (char *) malloc(1 + strlen(path)+ strlen(filename) );
-            strcpy(fullpath, path);
-            strcat(fullpath, filename);
-            char hash_content[65];
-            photostovis_hash_file_content_on_client(fullpath, hash_content);
-            char hash_path[65];
-            photostovis_hash_file_path_on_client(fullpath, hash_path);
-            char* newpath = fullpath;
+            if(dp->d_type==DT_DIR)
+            {
+                int nameLen = strlen(dp->d_name);
+                memcpy(path+currentPathLen, dp->d_name, nameLen);
+                path[currentPathLen+nameLen] = '/';
+                path[currentPathLen+nameLen+1] = '\0';
 
-            photostovis_write_to_backup_file(newpath, hash_path, hash_content);
+                photostovis_get_filenames_from_client(path, currentPathLen+nameLen+1);
+
+            }
+            else
+            {
+                filename = dp->d_name;
+                fullpath = (char *) malloc(1 + strlen(path)+ strlen(filename) );
+                strcpy(fullpath, path);
+                strcat(fullpath, filename);
+                char hash_content[65];
+                photostovis_hash_file_content_on_client(fullpath, hash_content);
+                char hash_path[65];
+                photostovis_hash_file_path_on_client(fullpath, hash_path);
+                char* newpath = fullpath;
+
+                photostovis_write_to_backup_file(newpath, hash_path, hash_content);
+            }
         }
+        path[currentPathLen]='\0';
     }
+
     closedir(dirp);
 }
 
