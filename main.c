@@ -106,6 +106,7 @@ int main (int argc, char **argv)
   arguments.repeat_count = 1;
   arguments.abort = 0;
   arguments.sync = 0;
+  arguments.backup_file_path = "-";
 
   /* Parse our arguments; every option seen by parse_opt will be
      reflected in arguments. */
@@ -125,12 +126,18 @@ int main (int argc, char **argv)
 
   if (arguments.sync)
   {
+     printf("BACKUP PATH: %s", arguments.backup_file_path);
+      /*
+     if (strcmp(arguments.server,"-"))
+     {
+        printf("\nMissing backup file path! Exiting...");
+        return 0;
+     }
+     */
+
      photostovis_clear_backup_file();
-     char path[4096];
-     const char* kStartingPath = "/home/global-sw-dev/Photostovis/pictures/";
-     strcpy(path, kStartingPath);
-     const unsigned int pathLength = strlen(path);
-     photostovis_get_filenames_from_client(path, pathLength);
+     const unsigned int pathLength = strlen(arguments.backup_file_path);
+     photostovis_get_filenames_from_client(arguments.backup_file_path, pathLength);
      printf("Syncing files to server...");
      photostovis_sync_files_to_server(socket);
      printf("Done syncing files to server!\n");

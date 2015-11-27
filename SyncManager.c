@@ -183,7 +183,6 @@ void photostovis_sync_files_to_server(int socket)
         //char path[] = "/home/global-sw-dev/Photostovis/image-03.jpg";
         //printf("path: %s\n\n", result[i].filePath);
         send_image(socket, result[i].filePath);
-
     }
 
    //send_image(socket, "/home/global-sw-dev/Photostovis/image-03.jpg");

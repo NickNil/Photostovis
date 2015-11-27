@@ -162,7 +162,7 @@ void send_image(int socket, char* imagepath)
     }
 
     image_name = basename(imagepath);
-    printf("basename: %s\n", image_name);
+    printf("Sending image: %s\n", image_name);
 
     write(socket, image_name, strlen(image_name)); //sending image name
 

@@ -112,7 +112,8 @@ int listen_for_connection(int sockfd, char argv0[], int port){
     {
         perror("accept()");
     }
-    else{
+    else
+    {
         printf("Connection Established\n");
     }
     return newsockfd;
@@ -192,8 +193,8 @@ void receive_image(int socket)
         packet_size = read(socket, &image_name, 256);
     }
 
-    printf("image name: %s\n\n", image_name);
-/*
+   printf("\nimage name: %s", image_name);
+
 
     packet_size = 0;
 
@@ -205,19 +206,18 @@ void receive_image(int socket)
 
     image_size = ntohl(image_size); //converting to host byte order
 
-    printf("packet received\n");
-    printf("packet size = %i\n", packet_size);
-    printf("image size = %i\n", image_size);
+  //  printf("packet received\n");
+   // printf("packet size = %i\n", packet_size);
+    //printf("image size = %i\n", image_size);
 
 
     char* base_path = "/home/global-sw-dev/Photostovis/backup-pictures/";
-    char new_path[strlen(base_path)+strlen(image_name)+1];
-    strcpy(new_path, base_path);
-    strcpy(new_path, image_name);
-    printf("\nNEW PATH: %s", base_path);
+    char new_path[strlen(base_path)+strlen(image_name)];
+    strcat(new_path, base_path);
+    strcat(new_path, image_name);
+    printf("\nSAVING TO PATH: %s", new_path);
 
-
-    picture = fopen("new_path.jpg", "w");
+    picture = fopen(new_path, "w");
     if (picture == NULL)
     {
         printf("ERROR LOADING IMAGE");
@@ -235,43 +235,47 @@ void receive_image(int socket)
 
         buffer_fd = select(FD_SETSIZE, &fds, NULL, NULL, &timeout);
 
-        if(buffer_fd < 0){
+        if(buffer_fd < 0)
+        {
             printf("error: bad file descriptor\n");
         }
 
-        if(buffer_fd == 0){
+        if(buffer_fd == 0)
+        {
             printf("error: buffer read timed out\n");
         }
 
         if(buffer_fd > 0)
         {
-            do{
+            do
+            {
                 read_size = read(socket, pict_array, 10241);
-            }while (read_size < 0);
+            }
+            while (read_size < 0);
 
             write_size = fwrite(pict_array, 1, read_size, picture); //write picture to file
 
-            if(read_size != write_size){
+            if(read_size != write_size)
+            {
                 printf("error in read write operation\n");
             }
 
-            printf("packet number received: %i\n", packet_index);
-            printf("packet size: %i\n", read_size);
-            printf("written image size: %i\n", write_size);
-            printf("image size = %i\n", image_size);
+            //printf("packet number received: %i\n", packet_index);
+            //printf("packet size: %i\n", read_size);
+            //printf("written image size: %i\n", write_size);
+            //printf("image size = %i\n", image_size);
 
             receive_size += read_size;
             packet_index++;
-            printf("total received image size: %i\n\n", receive_size);
+            //printf("total received image size: %i\n\n", receive_size);
 
         }
 
     }
 
     fclose(picture);
-    */
 
-    printf("image (hopefully) successfully received :D\n\n");
+    //printf("image (hopefully) successfully received :D\n\n");
 }
 
 int main(int argc, char *argv[])
@@ -330,32 +334,17 @@ int main(int argc, char *argv[])
     }
 
     int newsockfd;
-    while(1){
-        //printf("test1");
+
+    while(1)
+    {
         newsockfd = listen_for_connection(sockfd, argv[0], port);
-        //printf("test2");
-        //sendp(newsockfd, "ACK");
-        //printf("test3");
-        //receive_image(newsockfd);
-        printf("test4");
-        send_file(newsockfd);
-        receive_image(newsockfd);
-        /*
-        if(newsockfd >= 0){
-            printf(" Waiting for Hello message from client\n");
-            if(readp(newsockfd) >= 0){
-                printf(" Sending ACK message to client\n");
-                sendp(newsockfd, "ACK");
-            }
-            //receive_image(newsockfd);
+        if(newsockfd >= 0)
+        {
             send_file(newsockfd);
-        }*/
-
-
+            receive_image(newsockfd);
+            close(newsockfd);
+        }
     }
-    //printf("%s\n",inet_ntoa(server_addr.sin_addr));
-    //printf("%s\n",inet_ntoa(client_addr.sin_addr));
-
 
 
     // here communication would be possible using 'newsockfd'
