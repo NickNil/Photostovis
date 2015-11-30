@@ -143,13 +143,17 @@ int receive_file(int socket)
     }
     printf("file (hopefully) received successfully :D\n");
     fclose(received_file);
+
     return 0;
 }
 
 void send_image(int socket, char* imagepath)
 {
     FILE *picture;
-    int size, packet_size, read_size, packet_index;
+    time_t current_time;
+        char* c_time_string;
+    int size, packet_size, read_size, packet_index = 1;
+    uint32_t htonl_size = 0;
     char send_buffer[10240];
     char *image_name;
     packet_index = 1;
@@ -164,17 +168,29 @@ void send_image(int socket, char* imagepath)
     image_name = basename(imagepath);
     printf("Sending image: %s\n", image_name);
 
-    write(socket, image_name, strlen(image_name)); //sending image name
+    int name_bytes;
+
+    name_bytes = write(socket, image_name, strlen(image_name)+1); //sending image name
+
+    printf("\nnumber of bytes for filename sent: %d\n", name_bytes);
 
     fseek(picture, 0, SEEK_END);
     size = ftell(picture);			//getting image size
     fseek(picture, 0, SEEK_SET);
-    //printf("picture size  = %i\n", size);
-    size = htonl(size); //converting size to network byte order
+    printf("picture size  = %i\n", size);
+    htonl_size = htonl(size); //converting size to network byte order
+
 
     //sending image size
-    write(socket, (void *)&size, sizeof(int));
-    //int sent;
+    write(socket, &htonl_size, sizeof(uint32_t));
+    int sent = 0;
+
+    current_time = time(NULL);
+
+    /* Convert to local time format. */
+    c_time_string = ctime(&current_time);
+
+    printf("start time is %s\n\n", c_time_string);
 
     //sending image as a byte array
     while(!feof(picture))
@@ -185,15 +201,27 @@ void send_image(int socket, char* imagepath)
             packet_size = write(socket, send_buffer, read_size);
         }while(packet_size < 0);
 
-        //printf("packet number: %i\n", packet_index);
-          //printf("packet size sent: %i\n", read_size);
-           //printf("picture size  = %i\n", size);
-          //sent += read_size;
-          //printf("sent: %i\n", sent);
+
+        //printf("packet size sent: %i\n", read_size);
+
+        sent += read_size;
+
+
 
         packet_index++;
         bzero(send_buffer, sizeof(send_buffer));
     }
+    printf("packet number: %i\n", packet_index);
+    printf("picture size  = %i\n", size);
+    printf("sent: %i\n", sent);
+    current_time = time(NULL);
+
+    /* Convert to local time format. */
+    c_time_string = ctime(&current_time);
+
+    printf("sent picture time is %s\n\n", c_time_string);
+
+    fclose(picture);
 }
 
 int photostovis_connect_to_server(char* srv, int prt)

@@ -30,7 +30,7 @@ void photostovis_read_backup_file(char* backupFilePath, struct BackupFileContent
 /**
  * @brief Syncronizes files between client and server
  */
-void photostovis_sync_files_to_server(int socket);
+void photostovis_sync_files_to_server(int socket, char* server,unsigned int port);
 
 /**
  * @brief Checks the difference between two backup files

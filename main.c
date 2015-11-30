@@ -99,6 +99,9 @@ int main (int argc, char **argv)
 {
   struct arguments arguments;
 
+  char* server;
+  unsigned int port;
+
   /* Default values. */
   arguments.silent = 0;
   arguments.verbose = 0;
@@ -116,8 +119,8 @@ int main (int argc, char **argv)
   int socket;
   if (strcmp(arguments.server,"-"))
   {
-      char* server = strtok(arguments.server, ":");
-      unsigned int port = atoi(strtok(NULL, ""));
+      server = strtok(arguments.server, ":");
+      port = atoi(strtok(NULL, ""));
 
       socket = photostovis_connect_to_server(server, port);
       //printf("SOCKET %d", socket);
@@ -139,7 +142,7 @@ int main (int argc, char **argv)
      const unsigned int pathLength = strlen(arguments.backup_file_path);
      photostovis_get_filenames_from_client(arguments.backup_file_path, pathLength);
      printf("Syncing files to server...");
-     photostovis_sync_files_to_server(socket);
+     photostovis_sync_files_to_server(socket, server, port);
      printf("Done syncing files to server!\n");
   }
 
