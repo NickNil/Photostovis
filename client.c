@@ -158,6 +158,8 @@ void send_image(int socket, char* imagepath)
     char *image_name;
     packet_index = 1;
 
+    bzero(send_buffer, 10240);
+
     picture = fopen(imagepath, "r");
 
     if(picture == NULL)
@@ -165,12 +167,14 @@ void send_image(int socket, char* imagepath)
         printf("error opening image\n");
     }
 
+
     image_name = basename(imagepath);
     printf("Sending image: %s\n", image_name);
 
     int name_bytes;
 
-    name_bytes = write(socket, image_name, strlen(image_name)+1); //sending image name
+    sendp(socket, image_name);
+    //name_bytes = write(socket, image_name, strlen(image_name)+1); //sending image name
 
     printf("\nnumber of bytes for filename sent: %d\n", name_bytes);
 
@@ -187,7 +191,7 @@ void send_image(int socket, char* imagepath)
 
     current_time = time(NULL);
 
-    /* Convert to local time format. */
+    // Convert to local time format.
     c_time_string = ctime(&current_time);
 
     printf("start time is %s\n\n", c_time_string);
@@ -216,7 +220,7 @@ void send_image(int socket, char* imagepath)
     printf("sent: %i\n", sent);
     current_time = time(NULL);
 
-    /* Convert to local time format. */
+    // Convert to local time format.
     c_time_string = ctime(&current_time);
 
     printf("sent picture time is %s\n\n", c_time_string);

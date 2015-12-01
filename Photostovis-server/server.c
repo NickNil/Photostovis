@@ -64,7 +64,7 @@ int sendp(int sockfd, char* message) {
 }
 
 // function to read from client
-int readp(int sockfd) {
+char *readp(int sockfd) {
     int received = 0;
     char rec_message[256];
     unsigned char resbuf[2];
@@ -73,7 +73,7 @@ int readp(int sockfd) {
     received = read(sockfd,resbuf, 2);
     if (received < 0) {
         perror("ERROR reading from socket");//panic("ERROR reading from socket");
-        return -1;
+        return "-1";
     }
     memcpy((char *) &rec_packet_len, (char *) &resbuf, sizeof(uint16_t));
     rec_packet_len = ntohs(rec_packet_len);
@@ -85,7 +85,7 @@ int readp(int sockfd) {
     received = read(sockfd,randombuf, tcp_packet_len - 2);
     if (received < 0) {
         perror("ERROR reading from socket");//panic("ERROR reading from socket");
-        return -1;
+        return "-1";
     }
     uint16_t rec_msg_len = tcp_packet_len -2;
     unsigned int i;
@@ -94,7 +94,7 @@ int readp(int sockfd) {
     }
     //printf(" Received Message length = %d\n", rec_msg_len);
     printf(" Message Received from client = %s\n", rec_message);
-    return 0;
+    return rec_message;
 }
 
 int listen_for_connection(int sockfd, char argv0[], int port){
@@ -111,11 +111,12 @@ int listen_for_connection(int sockfd, char argv0[], int port){
     {
         sleep(1);
         int newsockfd = accept(sockfd, (struct sockaddr*) &client_addr, &client_len);
-        if (sent_file == 0)
+        if(sent_file == 0)
         {
             send_file(newsockfd);
             sent_file++;
         }
+
         if( newsockfd < 0 ) //{ perror("accept()"); panic("accept()"); }
         {
             perror("accept()");
@@ -136,7 +137,7 @@ int listen_for_connection(int sockfd, char argv0[], int port){
         if (pid == 0) {
          /* This is the client process */
          close(sockfd);
-         receive_image(newsockfd);
+         client_process(newsockfd);
          exit(0);
         }
         else {
@@ -148,15 +149,24 @@ int listen_for_connection(int sockfd, char argv0[], int port){
 
 }
 
-/*void client_process(int socket)
+void client_process(int socket)
 {
-    if(socket >= 0)
+    int i = 0;
+    while(i < 7)
     {
+        printf("picture: %d\n\n", i+1);
+        if(socket >= 0)
+        {
+            receive_image(socket);
+        }
 
-        receive_image(socket);
-        close(socket);
+        i++;
     }
-}*/
+
+
+
+    close(socket);
+}
 
 //function for sending a file
 int send_file(int socket)
@@ -222,42 +232,51 @@ void receive_image(int socket)
     int read_size, write_size;
     int packet_index = 1;
 
-    char image_name[256];
+    char *image_name;
     char pict_array[10241];
     FILE *picture;
 
     time_t current_time;
     char* c_time_string;
 
+    bzero(pict_array, 10241);
 
     //receive image name
-    while(packet_size == 0)
+    /*while(packet_size == 0)
     {
+        printf("\nin image name loop\n");
         packet_size = read(socket, &image_name, 256);
-    }
-   printf("\nnumber of bytes for filename received: %d\n", packet_size);
-   printf("\nimage name: %s", image_name);
+    }*/
 
+    image_name = readp(socket);
+    printf("\nimage name: %s", image_name);
+
+    //printf("\nnumber of bytes for filename received: %d\n", packet_size);
+
+    printf("\nimage name: %s", image_name);
 
     packet_size = 0;
 
     //receive image size
-    while(packet_size == 0)
-    {
-        packet_size = read(socket, &image_size, sizeof(uint32_t));
-    }
+    packet_size = read(socket, &image_size, sizeof(uint32_t));
+    printf("\nimage name: %s", image_name);
+
+    char* base_path = "/home/global-sw-dev/Photostovis/backup-pictures/";
+    char new_path[strlen(base_path)+strlen(image_name)];
+    printf("size: %d", strlen(base_path)+strlen(image_name));
+    strcpy(new_path, base_path);
+    strcat(new_path, image_name);
+
+    printf("\nnew path: %d", strlen(new_path));
 
     image_size = ntohl(image_size); //converting to host byte order
+    //printf("\npre image size: %d\n\n", image_size);
 
   //  printf("packet received\n");
     printf("bytes received for image size = %i\n", packet_size);
     //printf("image size = %i\n", image_size);
 
-
-    char* base_path = "/home/global-sw-dev/Photostovis/backup-pictures/";
-    char new_path[strlen(base_path)+strlen(image_name)+1];
-    strcpy(new_path, base_path);
-    strcat(new_path, image_name);
+    printf("\nimage name: %s", image_name);
     printf("\nSAVING TO PATH: %s", new_path);
 
     picture = fopen(new_path, "w");
@@ -276,7 +295,7 @@ void receive_image(int socket)
 
     current_time = time(NULL);
 
-    /* Convert to local time format. */
+    // Convert to local time format.
     c_time_string = ctime(&current_time);
 
     printf("start time is %s\n", c_time_string);
@@ -333,13 +352,20 @@ void receive_image(int socket)
     printf("total received image size: %i\n\n", receive_size);
     current_time = time(NULL);
 
-    /* Convert to local time format. */
+    // Convert to local time format.
     c_time_string = ctime(&current_time);
 
     printf("image received time is %s\n", c_time_string);
 
     fclose(picture);
 
+    /*char temp[256];
+
+    do
+    {
+        read_size = read(socket, temp, 256);
+        printf("extra bytes: %d\n", read_size);
+    } while(read_size > 0);*/
 
     printf("image (hopefully) successfully received :D\n\n");
 }

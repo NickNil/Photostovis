@@ -128,7 +128,7 @@ unsigned int photostovis_read_number_of_lines_in_file(FILE* fp)
 void photostovis_sync_files_to_server(int socket, char* server2, unsigned int port)
 {
     receive_file(socket);
-    printf("RECIEVED BACKUPFILE");
+    printf("RECIEVED BACKUPFILE, sending ACK\n");
     char* path = "/home/global-sw-dev/Photostovis/received_backup.txt";
     char* file_name = path;
     FILE* fp = fopen(file_name,"r");
@@ -174,10 +174,10 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
     int i;
     for(i = 0; i < size; i++)
     {
-        if (i != 0)
+        /*if (i != 0)
         {
             socket = photostovis_connect_to_server(server2, port);
-        }
+        }*/
         // Ensure we only are working on valid files
         if (result[i].fileHash != NULL)
         {
@@ -188,7 +188,7 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
         //printf("path: %s\n\n", result[i].filePath);
         send_image(socket, result[i].filePath);
 
-        close(socket);
+        //close(socket);
         sleep(1);
     }
 
