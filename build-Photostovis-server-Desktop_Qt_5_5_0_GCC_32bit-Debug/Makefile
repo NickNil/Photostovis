@@ -48,8 +48,10 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ../Photostovis-server/server.c 
-OBJECTS       = server.o
+SOURCES       = ../Photostovis-server/server.c \
+		../Photostovis-server/sha256.c 
+OBJECTS       = server.o \
+		sha256.o
 DIST          = ../../Qt5.5.0/5.5/gcc/mkspecs/features/spec_pre.prf \
 		../../Qt5.5.0/5.5/gcc/mkspecs/common/unix.conf \
 		../../Qt5.5.0/5.5/gcc/mkspecs/common/linux.conf \
@@ -175,7 +177,8 @@ DIST          = ../../Qt5.5.0/5.5/gcc/mkspecs/features/spec_pre.prf \
 		../../Qt5.5.0/5.5/gcc/mkspecs/features/exceptions.prf \
 		../../Qt5.5.0/5.5/gcc/mkspecs/features/yacc.prf \
 		../../Qt5.5.0/5.5/gcc/mkspecs/features/lex.prf \
-		../Photostovis-server/Photostovis-server.pro  ../Photostovis-server/server.c
+		../Photostovis-server/Photostovis-server.pro sha256.h ../Photostovis-server/server.c \
+		../Photostovis-server/sha256.c
 QMAKE_TARGET  = Photostovis-server
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = Photostovis-server
@@ -501,6 +504,9 @@ compiler_clean:
 
 server.o: ../Photostovis-server/server.c 
 	$(CC) -c $(CFLAGS) $(INCPATH) -o server.o ../Photostovis-server/server.c
+
+sha256.o: ../Photostovis-server/sha256.c ../Photostovis-server/sha256.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o sha256.o ../Photostovis-server/sha256.c
 
 ####### Install
 

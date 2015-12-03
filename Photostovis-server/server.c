@@ -24,6 +24,7 @@
 #include <getopt.h>
 #include <stdint.h>
 #include <ctype.h>
+#include <sha256.h>
 
 void print_usage() {
     printf("---- Usage: ./server [--port [port]] \n");
@@ -353,6 +354,13 @@ void receive_image(int socket)
 
     fclose(picture);
 
+    char hash_content[65];
+    hash_received_file_content_on_server(new_path, hash_content);
+    char hash_path[65];
+    hash_received_file_path_on_server(new_path, hash_path);
+
+    write_to_backup_file_on_server(new_path, hash_path, hash_content);
+
     printf("image (hopefully) successfully received :D\n\n");
 }
 
@@ -468,4 +476,65 @@ int main(int argc, char *argv[])
     //pause();
     return 0;
 
+}
+
+void hash_received_file_content_on_server(char* fullpath, char output[65])
+{
+    FILE* file = fopen(fullpath, "rb");
+    if(!file) return -1;
+
+    unsigned char hash[SHA256_BLOCK_SIZE];
+    SHA256_CTX sha256;
+    sha256_init(&sha256);
+    const int bufSize = 32768;
+    char* buffer = malloc(bufSize);
+    int bytesRead = 0;
+    if(!buffer) return -1;
+    while((bytesRead = fread(buffer, 1, bufSize, file)))
+    {
+        sha256_update(&sha256, buffer, bytesRead);
+    }
+    sha256_final(&sha256, hash);
+
+    sha256_hash_string(hash, output);
+    fclose(file);
+    free(buffer);
+    return 0;
+}
+
+void hash_received_file_path_on_server(char* path, char output[65])
+{
+    unsigned char buf[SHA256_BLOCK_SIZE];
+    SHA256_CTX ctx;
+
+    sha256_init(&ctx);
+    sha256_update(&ctx, path, strlen(path));
+    sha256_final(&ctx, buf);
+
+    sha256_hash_string(buf, output);
+}
+
+void sha256_hash_string (char hash[SHA256_BLOCK_SIZE], char outputBuffer[65])
+{
+    int i = 0;
+
+    for(i = 0; i < SHA256_BLOCK_SIZE; i++)
+    {
+        sprintf(outputBuffer + (i * 2), "%02x", (unsigned char)hash[i]);
+    }
+
+    outputBuffer[64] = 0;
+}
+
+void write_to_backup_file_on_server(char* path, char hash_path[65], char hash_file[65])
+{
+    char* backup_path = "/home/global-sw-dev/Photostovis/server-backup.txt";
+    FILE* file = fopen(backup_path, "a");
+    fprintf(file,"%s",path);
+    fprintf(file,"%s",",");
+    fprintf(file,"%s",hash_path);
+    fprintf(file,"%s",",");
+    fprintf(file,"%s",hash_file);
+    fprintf(file,"%s","\n");
+    fclose(file);
 }
