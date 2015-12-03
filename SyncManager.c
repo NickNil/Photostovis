@@ -84,8 +84,7 @@ int photostovis_client_server_backup_diff(struct BackupFileContent* client,
         for(j = 0; j < serverLength; j++)
         {
             //printf("\n %s %s %d %d", client[i].filePath, server[j].filePath, !strcmp(client[i].pathHash, server[j].pathHash), !strcmp(client[i].fileHash, server[j].fileHash));
-            if (!strcmp(client[i].pathHash, server[j].pathHash) &&
-                !strcmp(client[i].fileHash, server[j].fileHash))
+            if (!strcmp(client[i].fileHash, server[j].fileHash))
             {
                 equal = 1;
             }
