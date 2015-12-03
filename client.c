@@ -147,7 +147,7 @@ int receive_file(int socket)
     return 0;
 }
 
-void send_image(int socket, char* imagepath)
+void send_image(int socket, char* imagepath, char* const basePath)
 {
     FILE *picture;
     time_t current_time;
@@ -156,6 +156,7 @@ void send_image(int socket, char* imagepath)
     uint32_t htonl_size = 0;
     char send_buffer[10240];
     char *image_name;
+    char *image_dir;
     packet_index = 1;
 
     bzero(send_buffer, 10240);
@@ -167,16 +168,17 @@ void send_image(int socket, char* imagepath)
         printf("error opening image\n");
     }
 
-
-    image_name = basename(imagepath);
     printf("Sending image: %s\n", image_name);
 
-    int name_bytes;
+    image_dir = (char *) malloc(strlen(imagepath) - strlen(basePath) + 1);
 
-    sendp(socket, image_name);
-    //name_bytes = write(socket, image_name, strlen(image_name)+1); //sending image name
+    strcpy(image_dir, &imagepath[strlen(basePath)]);
 
-    printf("\nnumber of bytes for filename sent: %d\n", name_bytes);
+    printf("inner folders: %s\n", image_dir);
+
+    sendp(socket, image_dir); //sending image path
+
+    free(image_dir);
 
     fseek(picture, 0, SEEK_END);
     size = ftell(picture);			//getting image size
@@ -184,9 +186,7 @@ void send_image(int socket, char* imagepath)
     printf("picture size  = %i\n", size);
     htonl_size = htonl(size); //converting size to network byte order
 
-
-    //sending image size
-    write(socket, &htonl_size, sizeof(uint32_t));
+    write(socket, &htonl_size, sizeof(uint32_t)); //sending image size
     int sent = 0;
 
     current_time = time(NULL);

@@ -142,7 +142,7 @@ int main (int argc, char **argv)
      const unsigned int pathLength = strlen(arguments.backup_file_path);
      photostovis_get_filenames_from_client(arguments.backup_file_path, pathLength);
      printf("Syncing files to server...");
-     photostovis_sync_files_to_server(socket, server, port);
+     photostovis_sync_files_to_server(socket, server, port, arguments.backup_file_path);
      printf("Done syncing files to server!\n");
   }
 

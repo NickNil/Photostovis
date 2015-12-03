@@ -66,7 +66,7 @@ int sendp(int sockfd, char* message) {
 // function to read from client
 char *readp(int sockfd) {
     int received = 0;
-    char rec_message[256];
+    char *rec_message;
     unsigned char resbuf[2];
     uint16_t rec_packet_len;
     bzero(resbuf, 2);
@@ -80,6 +80,9 @@ char *readp(int sockfd) {
     uint16_t tcp_packet_len = rec_packet_len;
     //printf("Received TCP message length = %d\n", tcp_packet_len);
 
+    rec_message = (char *) malloc(256);
+    bzero(rec_message, 256);
+
     unsigned char randombuf[256];
     bzero(randombuf, 256);
     received = read(sockfd,randombuf, tcp_packet_len - 2);
@@ -88,10 +91,13 @@ char *readp(int sockfd) {
         return "-1";
     }
     uint16_t rec_msg_len = tcp_packet_len -2;
+
+    // change that to use memcpy
     unsigned int i;
-    for (i=0; i<=rec_msg_len; i++){
+    for (i=0; i<rec_msg_len; i++){
         rec_message[i] = randombuf[i];
     }
+    //rec_message[rec_msg_len] = '\0';
     //printf(" Received Message length = %d\n", rec_msg_len);
     printf(" Message Received from client = %s\n", rec_message);
     return rec_message;
@@ -232,7 +238,12 @@ void receive_image(int socket)
     int read_size, write_size;
     int packet_index = 1;
 
-    char *image_name;
+    char image_name[256];
+    char image_path[256];
+    char *rec_image_path;
+    char* base_path = "/home/global-sw-dev/Photostovis/backup-pictures/";
+    char new_path[1000];
+    char new_path_cpy[1000];
     char pict_array[10241];
     FILE *picture;
 
@@ -240,65 +251,54 @@ void receive_image(int socket)
     char* c_time_string;
 
     bzero(pict_array, 10241);
+    bzero(image_name, 256);
+    bzero(image_path, 256);
+    bzero(new_path, 1000);
+    bzero(new_path_cpy, 1000);
 
-    //receive image name
-    /*while(packet_size == 0)
-    {
-        printf("\nin image name loop\n");
-        packet_size = read(socket, &image_name, 256);
-    }*/
+    rec_image_path = readp(socket);
+    printf("\nimage path: %s\n", rec_image_path);
 
-    image_name = readp(socket);
-    printf("\nimage name: %s", image_name);
+    strcpy(image_path, rec_image_path);
+    free(rec_image_path);
+    printf("copied image path: %s\n", image_path);
 
-    //printf("\nnumber of bytes for filename received: %d\n", packet_size);
-
-    printf("\nimage name: %s", image_name);
+    strcpy(image_name, basename(image_path));
 
     packet_size = 0;
 
-    //receive image size
-    packet_size = read(socket, &image_size, sizeof(uint32_t));
-    printf("\nimage name: %s", image_name);
 
-    char* base_path = "/home/global-sw-dev/Photostovis/backup-pictures/";
-    char new_path[strlen(base_path)+strlen(image_name)];
-    printf("size: %d", strlen(base_path)+strlen(image_name));
-    strcpy(new_path, base_path);
-    strcat(new_path, image_name);
-
-    printf("\nnew path: %d", strlen(new_path));
+    packet_size = read(socket, &image_size, sizeof(uint32_t)); //reading image size
 
     image_size = ntohl(image_size); //converting to host byte order
-    //printf("\npre image size: %d\n\n", image_size);
 
-  //  printf("packet received\n");
-    printf("bytes received for image size = %i\n", packet_size);
-    //printf("image size = %i\n", image_size);
+    strcpy(new_path, base_path);
+    strcat(new_path, image_path);
+    strcpy(new_path_cpy, new_path);
+    make_folders(new_path_cpy);
 
-    printf("\nimage name: %s", image_name);
+    printf("\nnew path: %s\n", new_path);
+
     printf("\nSAVING TO PATH: %s", new_path);
+
+
 
     picture = fopen(new_path, "w");
     if (picture == NULL)
     {
         printf("ERROR LOADING IMAGE");
+        return;
     }
+
+
 
     struct timeval timeout = {10,0};
 
     fd_set fds;
     int buffer_fd;
 
-    printf("\npre receive size: %d\n", receive_size);
-    printf("pre image size: %d\n\n", image_size);
+    printf("image name: %s\n", image_name);
 
-    current_time = time(NULL);
-
-    // Convert to local time format.
-    c_time_string = ctime(&current_time);
-
-    printf("start time is %s\n", c_time_string);
 
     while(receive_size < image_size) //loop until entire image is received
     {
@@ -347,27 +347,39 @@ void receive_image(int socket)
 
     }
     printf("packet number received: %i\n", packet_index);
-    printf("written image size: %i\n", write_size);
     printf("image size = %i\n", image_size);
     printf("total received image size: %i\n\n", receive_size);
-    current_time = time(NULL);
 
-    // Convert to local time format.
-    c_time_string = ctime(&current_time);
-
-    printf("image received time is %s\n", c_time_string);
 
     fclose(picture);
 
-    /*char temp[256];
-
-    do
-    {
-        read_size = read(socket, temp, 256);
-        printf("extra bytes: %d\n", read_size);
-    } while(read_size > 0);*/
-
     printf("image (hopefully) successfully received :D\n\n");
+}
+
+void make_folders(char *path)
+{
+    struct  stat st = {0};
+    char dir[80];
+    char dir_cpy[80];
+
+    bzero(dir, 80);
+    bzero(dir_cpy, 80);
+    //printf("\npath in make_folders: %s \n", path);
+
+    strcpy(dir, dirname(path));
+
+    printf("dir: %s\n ", dir);
+
+    if (stat(dir, &st) == -1) //directory does not exist
+    {
+        strcpy(dir_cpy, dir);
+        make_folders(dir_cpy);
+        mkdir(dir, 0777);
+        printf("made folder %s\n", dir);
+    }
+
+    return;
+
 }
 
 int main(int argc, char *argv[])
