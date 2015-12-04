@@ -113,7 +113,7 @@ int receive_file(int socket)
             packet_size = read(socket, &file_size, sizeof(int));
     }
 
-    printf("packet received\n");
+    //printf("packet received\n");
     //printf("packet size = %i\n", packet_size);
     //printf("image size = %i\n", file_size);
 
@@ -132,16 +132,16 @@ int receive_file(int socket)
         }
 
        // printf("packet number received: %i\n", packet_index);
-        printf("packet size: %i\n", read_size);
-        printf("written file size: %i\n", write_size);
-        printf("file size = %i\n", file_size);
+        //printf("packet size: %i\n", read_size);
+        //printf("written file size: %i\n", write_size);
+        //printf("file size = %i\n", file_size);
 
         receive_size += read_size;
         //packet_index++;
-        printf("total received file size: %i\n\n", receive_size);
+        //printf("total received file size: %i\n\n", receive_size);
 
     }
-    printf("file (hopefully) received successfully :D\n");
+    printf("backup file received successfully :D\n");
     fclose(received_file);
 
     return 0;

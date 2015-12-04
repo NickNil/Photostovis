@@ -136,6 +136,7 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
     char* file_name = path;
 
     FILE* fp = fopen(file_name,"r");
+    uint32_t htonl_size = 0;
 
     if(fp == NULL)
     {
@@ -178,21 +179,19 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
     struct BackupFileContent result[size];
     photostovis_client_server_backup_diff(client, client_file_length, server, server_file_length, result, 1);
 
+    htonl_size = htonl(size); //converting size to network byte order
+    write(socket, &htonl_size, sizeof(uint32_t)); //sending image number
+    printf("image number: %d\n", size);
+
     int i;
     for(i = 0; i < size; i++)
     {
-        /*if (i != 0)
-        {
-            socket = photostovis_connect_to_server(server2, port);
-        }*/
+
         // Ensure we only are working on valid files
         if (result[i].fileHash != NULL)
         {
            printf("\nSaving file: %s", result[i].fileHash);
         }
-
-        //char path[] = "/home/global-sw-dev/Photostovis/image-03.jpg";
-        //printf("path: %s\n\n", result[i].filePath);
         send_image(socket, result[i].filePath, basePath);
 
         //close(socket);

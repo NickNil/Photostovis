@@ -118,11 +118,9 @@ int listen_for_connection(int sockfd, char argv0[], int port){
     {
         sleep(1);
         int newsockfd = accept(sockfd, (struct sockaddr*) &client_addr, &client_len);
-        if(sent_file == 0)
-        {
-            send_file(newsockfd);
-            sent_file++;
-        }
+
+        send_file(newsockfd);
+
 
         if( newsockfd < 0 ) //{ perror("accept()"); panic("accept()"); }
         {
@@ -158,21 +156,35 @@ int listen_for_connection(int sockfd, char argv0[], int port){
 
 void client_process(int socket)
 {
-    int i = 0;
-    while(i < 7)
-    {
-        printf("picture: %d\n\n", i+1);
-        if(socket >= 0)
-        {
-            receive_image(socket);
-        }
+    uint32_t images = 0;
 
-        i++;
+    read(socket, &images, sizeof(uint32_t));
+    images = ntohl(images);
+    printf("number of images to be received: %d\n", images);
+    int i = 0;
+    if (images == 0)
+    {
+        printf("server is up to date\n");
+        exit(0);
+    }
+    else
+    {
+        while(i < images)
+        {
+            printf("picture: %d\n\n", i+1);
+            if(socket >= 0)
+            {
+                receive_image(socket);
+            }
+
+            i++;
+        }
     }
 
 
 
     close(socket);
+    exit(0);
 }
 
 //function for sending a file
