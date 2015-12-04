@@ -116,7 +116,6 @@ int listen_for_connection(int sockfd, char argv0[], int port){
 
     while(1)
     {
-        sleep(1);
         int newsockfd = accept(sockfd, (struct sockaddr*) &client_addr, &client_len);
 
         send_file(newsockfd);
@@ -162,26 +161,17 @@ void client_process(int socket)
     images = ntohl(images);
     printf("number of images to be received: %d\n", images);
     int i = 0;
-    if (images == 0)
+    while(i < images)
     {
-        printf("server is up to date\n");
-        exit(0);
-    }
-    else
-    {
-        while(i < images)
+        printf("picture: %d\n\n", i+1);
+        if(socket >= 0)
         {
-            printf("picture: %d\n\n", i+1);
-            if(socket >= 0)
-            {
-                receive_image(socket);
-            }
-
-            i++;
+            receive_image(socket);
         }
+
+        i++;
     }
-
-
+    printf("server is up to date\n");
 
     close(socket);
     exit(0);

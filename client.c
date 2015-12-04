@@ -65,6 +65,7 @@ void sendp(int sockfd, char* message) {
     memcpy((char *)&buffer[0], (char *) &packet_len_buf, sizeof(uint16_t));
     memcpy(&buffer[2], message, data_len);
     int n = write(sockfd,buffer,tcp_msg_len);
+    printf("message from client: %s\n", buffer);
     if (n < 0) {
         perror("Write Error"); panic("Write Error");
     }

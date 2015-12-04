@@ -195,7 +195,7 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
         send_image(socket, result[i].filePath, basePath);
 
         //close(socket);
-        sleep(1);
+        usleep(150000);
     }
 
    //send_image(socket, "/home/global-sw-dev/Photostovis/image-03.jpg");
