@@ -25,12 +25,12 @@ unsigned int photostovis_read_number_of_lines_in_file(FILE* fp);
  * @brief Reads local or server backup file
  * @param backupFilePath
  */
-void photostovis_read_backup_file(char* backupFilePath, struct BackupFileContent*);
+void photostovis_read_backup_file(char backupFilePath[], struct BackupFileContent*);
 
 /**
  * @brief Syncronizes files between client and server
  */
-void photostovis_sync_files_to_server(int socket, char* server,unsigned int port, char* const basePath);
+void photostovis_sync_files_to_server(int socket, char* server,unsigned int port, char* const basePath, char full_exe_path[1024]);
 
 /**
  * @brief Checks the difference between two backup files

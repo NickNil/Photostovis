@@ -12,7 +12,11 @@ void photostovis_get_filenames_from_client(char* const currentPath, const unsign
     dirp = opendir(path);
     while((dp = readdir(dirp)) != NULL)
     {
-        if(strlen(dp->d_name) > 2)
+        if(!strcmp(dp->d_name,".") || !strcmp(dp->d_name,"..") || !strcmp(dp->d_name,"./"))
+        {
+            continue;
+        }
+        else
         {
             if(dp->d_type==DT_DIR)
             {

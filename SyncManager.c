@@ -28,7 +28,7 @@ char* photostovis_backup_file_getfield(char* line, int num)
  * @brief Reads local or server backup file
  * @param backupFilePath
  */
-void photostovis_read_backup_file(char* backupFilePath, struct BackupFileContent* fileContent)
+void photostovis_read_backup_file(char backupFilePath[], struct BackupFileContent* fileContent)
 {
    char* file_name = backupFilePath;
    FILE* fp = fopen(file_name,"r");
@@ -124,17 +124,22 @@ unsigned int photostovis_read_number_of_lines_in_file(FILE* fp)
 /**
  * @brief Syncronizes files between client and server
  */
-void photostovis_sync_files_to_server(int socket, char* server2, unsigned int port, char* const basePath)
+void photostovis_sync_files_to_server(int socket, char* server2, unsigned int port, char* const basePath, char full_exe_path[1024])
 {
     receive_file(socket);
     printf("RECIEVED BACKUPFILE\n");
-    char* path = "/home/global-sw-dev/Photostovis/received_backup.txt";
+
+    char exe_path_received[strlen(full_exe_path)];
+    strcpy(exe_path_received, full_exe_path);
+    strcat(exe_path_received, "received_backup.txt");
+    char* path = exe_path_received;
     char* file_name = path;
+
     FILE* fp = fopen(file_name,"r");
 
     if(fp == NULL)
     {
-       perror("Error while opening backup file.\n");
+       perror("Error while opening backup file server.\n");
        return;
     }
 
@@ -142,14 +147,20 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
     rewind(fp);
     fclose(fp);
 
-    char* client_path = "/home/global-sw-dev/Photostovis/backup.txt";
+    struct BackupFileContent server[server_file_length];
+    photostovis_read_backup_file(exe_path_received, server);
+
+    char exe_path_backup[strlen(full_exe_path)];
+    strcpy(exe_path_backup, full_exe_path);
+    strcat(exe_path_backup, "backup.txt");
+    char* client_path = exe_path_backup;
     char* client_file_name = client_path;
     FILE* client_fp = fopen(client_file_name,"r");
 
 
     if(client_fp == NULL)
     {
-       perror("Error while opening backup file.\n");
+       perror("Error while opening backup file client.\n");
        return;
     }
 
@@ -158,11 +169,8 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
     rewind(client_fp);
     fclose(client_fp);
 
-    struct BackupFileContent server[server_file_length];
-    photostovis_read_backup_file(path, server);
-
     struct BackupFileContent client[client_file_length];
-    photostovis_read_backup_file(client_path, client);
+    photostovis_read_backup_file(exe_path_backup, client);
 
 
     int size = photostovis_client_server_backup_diff(client, client_file_length, server, server_file_length, NULL, 0);
