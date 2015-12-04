@@ -1,8 +1,8 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include<sys/types.h>
+#include<sys/stat.h>
 #include<unistd.h>
 #include "scrambler.h"
 #include "error_mgmt.h"
@@ -11,10 +11,17 @@
 
 
 #define KEYLEN 1024
+#define KEYFILE "keyfile.txt"
 // Path for saving encrypted files
-#define ENCRYPT "/home/global-sw-dev/Photostovis/encrypted/"
+#define ENCRYPT "./encrypted/"
 
 char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789";
+
+// Checks if the given file is accessible or not
+int file_exists(char *filename)
+{
+    return access(filename, F_OK);
+}
 
 // Create random name for encrypted files
 void createfilename(char *pw){
@@ -27,7 +34,7 @@ void createfilename(char *pw){
             rem = r%nchars;
             pw[k++] = charset[rem];
             r/=nchars;
-       }
+        }
     }
     pw[k] = '\0';
     return;
@@ -87,9 +94,19 @@ void photostovis_run_encryption(char **added_files, int numberoffiles)
     }
 
     // Key Creation starts here
-    // TODO check if the key file is already generated
     computeKeyFromFiles(shifted_files, numberoffiles, keySequence, KEYLEN);
-    // Key created after this point
+
+    // Writing created key to file
+    if(file_exists(KEYFILE) != 0)
+    {
+        printf("\n keyfile doesn't exists!!\n");
+        FILE *keyfile = fopen(KEYFILE, "w+");
+        if(KEYLEN != fwrite(keySequence, 1, KEYLEN, keyfile))
+        {
+            printf("\n keyfile fwrite() Error!!\n");
+            exit(-1);
+        }
+    }
 
     for(pic=0; pic<numberoffiles; pic++){
         fclose(shifted_files[pic]);
