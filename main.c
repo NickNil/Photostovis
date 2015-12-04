@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
+#include "encrypt_main.h"
 
 const char *argp_program_version = "photostovis-0.0.1";
 const char *argp_program_bug_address = "<bugss@photostovis.com>";
@@ -22,6 +23,7 @@ static struct argp_option options[] = {
   {"server",   's', "server",  0, "Server IP:Port, 127.0.0.1:8000" },
   {"path",   'p', "path",  0, "Backup directory" },
   {"abort",    OPT_ABORT, 0, 0, "Abort before showing any output"},
+  {"encrypt",   'e', "encrypt", 0, "Encrypt files before sending"},
 
   { 0 }
 };
@@ -31,7 +33,7 @@ struct arguments
 {
   char *arg1;                   /* arg1 */
   char **strings;               /* [string…] */
-  int silent, verbose, abort;   /* ‘-s’, ‘-v’, ‘--abort’ */
+  int silent, verbose, abort, encrypt;   /* ‘-s’, ‘-v’, ‘--abort’ , ' --encrypt'*/
   char *server;            /* file arg to ‘--output’ */
   int repeat_count;             /* count arg to ‘--repeat’ */
   char* sync;
@@ -59,6 +61,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
       break;
     case 'r':
       arguments->repeat_count = arg ? atoi (arg) : 10;
+      break;
+    case 'e':
+      arguments->encrypt = 1;
       break;
     case OPT_ABORT:
       arguments->abort = 1;
@@ -110,6 +115,7 @@ int main (int argc, char **argv)
   arguments.abort = 0;
   arguments.sync = 0;
   arguments.backup_file_path = "-";
+  arguments.encrypt = 0;
 
   /* Parse our arguments; every option seen by parse_opt will be
      reflected in arguments. */
@@ -153,6 +159,13 @@ int main (int argc, char **argv)
      printf("Syncing files to server...");
      photostovis_sync_files_to_server(socket, server, port, arguments.backup_file_path);
      printf("Done syncing files to server!\n");
+  }
+
+  if(arguments.encrypt)
+  {
+    printf("\nEncrypting Files\n");
+    photostovis_encrypt_files();
+    printf("\nDone Encrypting files, Encrypted files saved in ./encrypted folder\n");
   }
 
   close(socket);
