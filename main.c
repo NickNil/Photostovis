@@ -138,9 +138,18 @@ int main (int argc, char **argv)
      }
      */
 
-     photostovis_clear_backup_file();
+     char full_exe_path[1024]; // full path to executable folder
+     ssize_t len = readlink("/proc/self/exe", full_exe_path, sizeof(full_exe_path)-1);
+     if (len != -1) {
+        full_exe_path[len-11] = '\0';
+     }
+     else {
+       perror("ERROR: Path not found.");
+     }
+
+     photostovis_clear_backup_file(full_exe_path);
      const unsigned int pathLength = strlen(arguments.backup_file_path);
-     photostovis_get_filenames_from_client(arguments.backup_file_path, pathLength);
+     photostovis_get_filenames_from_client(arguments.backup_file_path, pathLength, full_exe_path);
      printf("Syncing files to server...");
      photostovis_sync_files_to_server(socket, server, port, arguments.backup_file_path);
      printf("Done syncing files to server!\n");

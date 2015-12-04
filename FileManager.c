@@ -1,7 +1,7 @@
 #include "FileManager.h"
 #include "assert.h"
 
-void photostovis_get_filenames_from_client(char* const currentPath, const unsigned int currentPathLen)
+void photostovis_get_filenames_from_client(char* const currentPath, const unsigned int currentPathLen, char full_exe_path[])
 {
     DIR *dirp;
     char* path = currentPath;
@@ -21,7 +21,7 @@ void photostovis_get_filenames_from_client(char* const currentPath, const unsign
                 path[currentPathLen+nameLen] = '/';
                 path[currentPathLen+nameLen+1] = '\0';
 
-                photostovis_get_filenames_from_client(path, currentPathLen+nameLen+1);
+                photostovis_get_filenames_from_client(path, currentPathLen+nameLen+1, full_exe_path);
 
             }
             else
@@ -36,7 +36,7 @@ void photostovis_get_filenames_from_client(char* const currentPath, const unsign
                 photostovis_hash_file_path_on_client(fullpath, hash_path);
                 char* newpath = fullpath;
 
-                photostovis_write_to_backup_file(newpath, hash_path, hash_content);
+                photostovis_write_to_backup_file(newpath, hash_path, hash_content, full_exe_path);
             }
         }
         path[currentPathLen]='\0';
@@ -93,13 +93,15 @@ void sha256_hash_string (char hash[SHA256_BLOCK_SIZE], char outputBuffer[65])
     outputBuffer[64] = 0;
 }
 
-void photostovis_write_to_backup_file(char* path, char hash_path[65], char hash_file[65])
+void photostovis_write_to_backup_file(char* path, char hash_path[65], char hash_file[65], char full_exe_path[])
 {
-    char* backup_path = "/home/global-sw-dev/Photostovis/backup.txt";
+    char backup_path[strlen(full_exe_path)];
+    strcpy(backup_path, full_exe_path);
+
+    strcat(backup_path, "backup.txt");
+
     FILE* file = fopen(backup_path, "a");
-    //fprintf(file,"%s","\"");
     fprintf(file,"%s",path);
-    //fprintf(file,"%s","\"");
     fprintf(file,"%s",",");
     fprintf(file,"%s",hash_path);
     fprintf(file,"%s",",");
@@ -108,9 +110,13 @@ void photostovis_write_to_backup_file(char* path, char hash_path[65], char hash_
     fclose(file);
 }
 
-void photostovis_clear_backup_file()
+void photostovis_clear_backup_file(char full_exe_path[])
 {
-    char* backup_path = "/home/global-sw-dev/Photostovis/backup.txt";
+    char backup_path[strlen(full_exe_path)];
+    strcpy(backup_path, full_exe_path);
+
+    strcat(backup_path, "backup.txt");
+
     FILE* file = fopen(backup_path, "w");
     fclose(file);
 }

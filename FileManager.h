@@ -13,8 +13,9 @@
  * If multiple folders are located inside the photo-folder, the filenames are gathered from these as well.
  * @param currentPath : The current path for the photo-files.
  * @param currentPathLen : The current length of the path.
+ * @param full_exe_path : The full path to the executable folder on the client
  */
-void photostovis_get_filenames_from_client(char* const currentPath, const unsigned int currentPathLen);
+void photostovis_get_filenames_from_client(char* const currentPath, const unsigned int currentPathLen, char full_exe_path[]);
 
 /**
  * @brief Hashes the file content of the current file.
@@ -45,10 +46,12 @@ void sha256_hash_string (char hash[SHA256_BLOCK_SIZE], char outputBuffer[65]);
  * @param path : The full path to the file.
  * @param hash_path : The hashed path to the file.
  * @param hash_file : The hashed file content.
+ * @param full_exe_path : The full path to the executable folder on the client
  */
-void photostovis_write_to_backup_file(char* path, char hash_path[65], char hash_file[65]);
+void photostovis_write_to_backup_file(char* path, char hash_path[65], char hash_file[65], char full_exe_path[]);
 
 /**
  * @brief Deletes the current content of the backup.txt file on client.
+ * @param full_exe_path : The full path to the executable folder on the client
  */
-void photostovis_clear_backup_file();
+void photostovis_clear_backup_file(char full_exe_path[]);
