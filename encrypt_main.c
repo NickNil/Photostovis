@@ -41,9 +41,9 @@ void empty_dir(char *path)
         {
             if(strcmp(direntry->d_name, ".") != 0 && strcmp(direntry->d_name, ".."))
             {
-                strncpy(filepath, path, strlen(path));
-                strncat(filepath, "/", strlen("/"));
-                strncat(filepath, direntry->d_name, strlen(direntry->d_name));
+                strcpy(filepath, path);
+                strcat(filepath, "/");
+                strcat(filepath, direntry->d_name);
                 if(unlink(filepath) != 0)
                 {
                     printf("\nError deleting %s \n", filepath);
@@ -73,11 +73,11 @@ void createfilename(char *filename){
 
 
 // Save encrypted file in specified folder
-void save_file(char *filename, char *pic_file) 
+void save_file(char *dir, char *filename, char *pic_file) 
 {
-    strncpy(filename, ENCRYPTDIR, sizeof(ENCRYPTDIR));
-    strncat(filename, "/", strlen("/"));
-    strncat(filename, pic_file, strlen(pic_file));
+    strncpy(filename, dir, 255);
+    strcat(filename, "/");
+    strcat(filename, pic_file);
 }
 
 // Create Key and Encrypt files
@@ -113,7 +113,7 @@ void photostovis_run_encryption(char **added_files, int numberoffiles)
             // Creating byte shifted files in encrypted folder 
             memset(pic_file, 0, 255);
             createfilename(pic_file);
-            save_file(shifted_filename, pic_file); 
+            save_file(ENCRYPTDIR, shifted_filename, pic_file); 
             shiftedfiles[pic] = strndup(shifted_filename, 255);
 
             dstFile = fopen(shifted_filename, "w+");
@@ -164,7 +164,7 @@ void photostovis_run_encryption(char **added_files, int numberoffiles)
             // Creating encrypted files in encrypted folder 
             memset(pic_file, 0, 255);
             createfilename(pic_file);
-            save_file(encrypted_filename, pic_file); 
+            save_file(ENCRYPTDIR, encrypted_filename, pic_file); 
             encrypted_files[pic] = fopen(encrypted_filename, "w+");
             if(NULL == encrypted_files[pic])
             {
@@ -178,9 +178,9 @@ void photostovis_run_encryption(char **added_files, int numberoffiles)
             // Write encrypted file path and random generated name to encrypted_list file
             memset(encrypted_list_content, 0, 255);
             strncpy(encrypted_list_content, added_files[pic], 255);
-            strncat(encrypted_list_content, "\",", strlen("\","));
-            strncat(encrypted_list_content, pic_file, strlen(pic_file));
-            strncat(encrypted_list_content, "\n", strlen("\n"));
+            strcat(encrypted_list_content, "\",");
+            strcat(encrypted_list_content, pic_file);
+            strcat(encrypted_list_content, "\n");
             if(strlen(encrypted_list_content) != fwrite((encrypted_list_content), 1, strlen(encrypted_list_content), encrypted_list))
             {
                 printf("\n fwrite() Error!!\n");

@@ -48,6 +48,17 @@ int test_createfilename(char *filename)
     return test_passed;
 }
 
+// Test save_file() function 
+int test_save_file(char *dir, char *filename, char *pic_file)
+{
+    int test_passed = 0;
+    save_file(dir, filename, pic_file);
+    assert(strlen(filename)==strlen(dir)+strlen(pic_file)+1);
+    test_passed++;
+
+    return test_passed;
+}
+
 int main()
 {
     int test_passed = 0;
@@ -67,15 +78,18 @@ int main()
     char *randomfilename;
     randomfilename = malloc(255*sizeof(char));
     strcpy(randomfilename, "randomfile.txt");
+    char *filepath = malloc(255*sizeof(char));
 
     // Call test functions
     test_passed += test_file_exists(filename);
     test_passed += test_empty_dir(ENCRYPTDIR, filename);
     test_passed += test_createfilename(randomfilename);
+    test_passed += test_save_file(ENCRYPTDIR, filepath, filename);
     
     printf("\n %d Tests Passed.\n", test_passed);
 
     // Cleaning up
+    free(filepath);
     free(filename);
     free(randomfilename);
     unlink(filename);
