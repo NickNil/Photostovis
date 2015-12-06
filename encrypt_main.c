@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include<dirent.h>
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<unistd.h>
@@ -13,7 +14,9 @@
 #define KEYLEN 1024
 #define KEYFILE "keyfile.txt"
 // Path for saving encrypted files
-#define ENCRYPT "./encrypted/"
+#define ENCRYPTDIR "./encrypted"
+#define ENCRYPTEDLIST "encrypted_list.txt"
+#define NEWFILELIST "./textfiles/filesadded.txt"
 
 char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789";
 
@@ -21,6 +24,31 @@ char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789";
 int file_exists(char *filename)
 {
     return access(filename, F_OK);
+}
+
+// Delete directory contents
+void empty_dir(char *path)
+{
+    DIR *dirptr;
+    struct dirent *direntry;
+    char filepath[255];
+
+    dirptr = opendir(path);
+
+    if(dirptr != NULL)
+    {
+        while((direntry = readdir(dirptr)) != NULL)
+        {
+            strcpy(filepath, path);
+            strcat(filepath, "/");
+            strcat(filepath, direntry->d_name);
+            if(unlink(filepath) != 0)
+            {
+                printf("\nError deleting %s \n", filepath);
+            }
+        }
+    }
+    closedir(dirptr);
 }
 
 // Create random name for encrypted files
@@ -44,143 +72,244 @@ void createfilename(char *pw){
 // Save encrypted file in specified folder
 void save_file(char *filename, char *pic_file) 
 {
-    strncpy(filename, ENCRYPT, sizeof(ENCRYPT));
+    strncpy(filename, ENCRYPTDIR, sizeof(ENCRYPTDIR));
+    strcat(filename, "/");
     strcat(filename, pic_file);
 }
 
 // Create Key and Encrypt files
 void photostovis_run_encryption(char **added_files, int numberoffiles)
 {
-    FILE *fd = NULL, *dstFile = NULL;
-    unsigned char *keySequence;
-    keySequence = malloc(KEYLEN*sizeof(unsigned char));
-    char *shifted_filename, *encrypted_filename, *pic_file;
-    shifted_filename = malloc(255*sizeof(char));
-    encrypted_filename = malloc(255*sizeof(char));
-    pic_file = malloc(255*sizeof(char));
-    char** shiftedfiles;
-    shiftedfiles = malloc(numberoffiles*sizeof(char*));
-    FILE **shifted_files, **encrypted_files;
-    shifted_files = malloc(numberoffiles*sizeof(FILE*));
-    encrypted_files = malloc(numberoffiles*sizeof(FILE*));
-    int pic;
-    for(pic=0; pic<numberoffiles; pic++)
+    if(numberoffiles > 0)
     {
-        fd = fopen(strtok(strtok(added_files[pic], "\""), "\""), "r");
-        // Creating byte shifted files in encrypted folder 
-        memset(pic_file, 0, 255);
-        createfilename(pic_file);
-        save_file(shifted_filename, pic_file); 
-        shiftedfiles[pic] = strndup(shifted_filename, 255);
+        FILE *fd = NULL, *dstFile = NULL, *encrypted_list = NULL;
+        unsigned char *keySequence;
+        keySequence = malloc(KEYLEN*sizeof(unsigned char));
+        char *shifted_filename, *encrypted_filename, *pic_file;
+        shifted_filename = malloc(255*sizeof(char));
+        encrypted_filename = malloc(255*sizeof(char));
+        pic_file = malloc(255*sizeof(char));
+        // This contains array of shifted file paths
+        char** shiftedfiles;
+        shiftedfiles = malloc(numberoffiles*sizeof(char*));
+        // These are arrays of file pointers
+        FILE **shifted_files, **encrypted_files;
+        shifted_files = malloc(numberoffiles*sizeof(FILE*));
+        encrypted_files = malloc(numberoffiles*sizeof(FILE*));
 
-        dstFile = fopen(shifted_filename, "w+");
-
-        if(NULL == fd || NULL == dstFile)
+        encrypted_list = fopen("encrypted_list.txt", "a");
+        if(encrypted_list == NULL)
         {
-            printf("\n fopen() Error!!\n");
+            printf("\n encrypted list fopen() Error!!\n");
             exit(-1);
         }
-
-        shiftFileContents(fd, dstFile);
-        shifted_files[pic] = fopen(shifted_filename, "rw");
-
-        if(NULL == shifted_files[pic])
+        int pic;
+        for(pic=0; pic<numberoffiles; pic++)
         {
-            printf("\n fopen() Error!!\n");
-            exit(-1);
-        }
-        fclose(fd);
-        fclose(dstFile);
-    }
+            fd = fopen(strtok(strtok(added_files[pic], "\""), "\""), "r");
+            // Creating byte shifted files in encrypted folder 
+            memset(pic_file, 0, 255);
+            createfilename(pic_file);
+            save_file(shifted_filename, pic_file); 
+            shiftedfiles[pic] = strndup(shifted_filename, 255);
 
-    // Key Creation starts here
-    computeKeyFromFiles(shifted_files, numberoffiles, keySequence, KEYLEN);
+            dstFile = fopen(shifted_filename, "w+");
 
-    // Writing created key to file
-    if(file_exists(KEYFILE) != 0)
-    {
-        printf("\n keyfile doesn't exists!!\n");
-        FILE *keyfile = fopen(KEYFILE, "w+");
-        if(KEYLEN != fwrite(keySequence, 1, KEYLEN, keyfile))
-        {
-            printf("\n keyfile fwrite() Error!!\n");
-            exit(-1);
-        }
-    }
+            if(NULL == fd || NULL == dstFile)
+            {
+                printf("\n fd dstFile fopen() Error!!\n");
+                exit(-1);
+            }
 
-    for(pic=0; pic<numberoffiles; pic++){
-        fclose(shifted_files[pic]);
-    }
+            shiftFileContents(fd, dstFile);
+            shifted_files[pic] = fopen(shifted_filename, "rw");
 
-    // Encryption of files using Key starts here 
-    char *srcFile;
-    for(pic=0; pic<numberoffiles; pic++){
-        srcFile = strndup(shiftedfiles[pic], 255);
-        shifted_files[pic] = fopen(srcFile, "r");
-        // Creating encrypted files in encrypted folder 
-        memset(pic_file, 0, 255);
-        createfilename(pic_file);
-        save_file(encrypted_filename, pic_file); 
-        encrypted_files[pic] = fopen(encrypted_filename, "w+");
-        if(NULL == encrypted_files[pic])
-        {
-            printf("\n fopen() Error!!\n");
-            exit(-1);
+            if(NULL == shifted_files[pic])
+            {
+                printf("\n fopen() Error!!\n");
+                exit(-1);
+            }
+            fclose(fd);
+            fclose(dstFile);
         }
 
-        scrambleFileContents(shifted_files[pic], encrypted_files[pic], keySequence, KEYLEN);
-        fclose(shifted_files[pic]);
-        free(srcFile);
-        fclose(encrypted_files[pic]);
-    }
+        // Key Creation starts here
+        computeKeyFromFiles(shifted_files, numberoffiles, keySequence, KEYLEN);
 
-    free(shifted_files);
-    free(encrypted_files);
-    free(shifted_filename);
-    free(encrypted_filename);
-    free(keySequence);
-    for(pic=0; pic<numberoffiles; pic++){
-        remove(shiftedfiles[pic]);
-        free(shiftedfiles[pic]);
+        // Writing created key to file
+        if(file_exists(KEYFILE) != 0)
+        {
+            //printf("\n keyfile doesn't exists!!\n");
+            FILE *keyfile = fopen(KEYFILE, "w+");
+            if(KEYLEN != fwrite(keySequence, 1, KEYLEN, keyfile))
+            {
+                printf("\n keyfile fwrite() Error!!\n");
+                exit(-1);
+            }
+        }
+
+        for(pic=0; pic<numberoffiles; pic++){
+            fclose(shifted_files[pic]);
+        }
+
+        // Encryption of files using Key starts here 
+        char *srcFile, *encrypted_list_content;
+        encrypted_list_content = malloc(255*sizeof(char));
+        for(pic=0; pic<numberoffiles; pic++){
+            srcFile = strndup(shiftedfiles[pic], 255);
+            shifted_files[pic] = fopen(srcFile, "r");
+            // Creating encrypted files in encrypted folder 
+            memset(pic_file, 0, 255);
+            createfilename(pic_file);
+            save_file(encrypted_filename, pic_file); 
+            encrypted_files[pic] = fopen(encrypted_filename, "w+");
+            if(NULL == encrypted_files[pic])
+            {
+                printf("\n encrypted files fopen() Error!!\n");
+                exit(-1);
+            }
+
+            scrambleFileContents(shifted_files[pic], encrypted_files[pic], keySequence, KEYLEN);
+            memset(encrypted_list_content, 0, 255);
+            strncpy(encrypted_list_content, added_files[pic], 255);
+            strcat(encrypted_list_content, "\",");
+            strcat(encrypted_list_content, pic_file);
+            strcat(encrypted_list_content, "\n");
+            if(strlen(encrypted_list_content) != fwrite((encrypted_list_content), 1, strlen(encrypted_list_content), encrypted_list))
+            {
+                printf("\n fwrite() Error!!\n");
+                exit(-1);
+            }
+            fclose(shifted_files[pic]);
+            free(srcFile);
+            fclose(encrypted_files[pic]);
+        }
+
+        fclose(encrypted_list);
+        free(encrypted_list_content);
+        free(shifted_files);
+        free(encrypted_files);
+        free(shifted_filename);
+        free(encrypted_filename);
+        free(keySequence);
+        for(pic=0; pic<numberoffiles; pic++){
+            remove(shiftedfiles[pic]);
+            free(shiftedfiles[pic]);
+        }
+        free(shiftedfiles);
+        free(pic_file);
+
     }
-    free(shiftedfiles);
-    free(pic_file);
 }
 
 // Reading from the text file where new added files are listed
 void photostovis_read_newfiles()
 {
     // Reading new added files in filesadded.txt file
-    FILE* newfd = NULL;
+    FILE* newfd = NULL, *oldfd = NULL;
+    int numberoffiles = 4,  filecount = 0, k, i;
+    int oldnumberoffiles = 4, encrypted_files_exists = 0, unencrypted_file = 0;
+    char buff[255];
+    char *token;
+    char **added_files, **old_encrypted_files;
+    old_encrypted_files = malloc(oldnumberoffiles*sizeof(char*));
     // TODO Provide the file to read
-    newfd = fopen("./textfiles/filesadded.txt", "r");
+    newfd = fopen(NEWFILELIST, "r");
     if(NULL == newfd)
     {
         printf("\n fopen() Error!!\n");
         exit(-1);
     }
+    // Check if file containing list of already encrypted files exists 
+    if(file_exists(ENCRYPTEDLIST) == 0)
+    {
+        encrypted_files_exists = 1;
+        oldfd = fopen(ENCRYPTEDLIST, "r");
 
-    int numberoffiles = 4, filecount = 0, k;
-    char buff[255];
-    char *token;
-    char **added_files;
-    added_files = malloc(numberoffiles*sizeof(char*));
+        if(NULL == oldfd)
+        {
+            printf("\n fopen() Error!!\n");
+            exit(-1);
+
+        }
+        // Reading list of old encrypted files 
+        while(NULL != fgets(buff, 255, oldfd))
+        {
+            token = strtok(buff, ",");
+            if(filecount>=oldnumberoffiles){
+                oldnumberoffiles++;
+                old_encrypted_files = realloc(old_encrypted_files, oldnumberoffiles*sizeof(char*)); 
+            }
+            old_encrypted_files[filecount] = strndup(token, 255);
+            filecount++;
+        }
+        printf("\n Encrypted list file exists = %d\n", encrypted_files_exists);
+        filecount = 0;
+    }
+    else
+    {
+        // Empty encrypted directory if encrypted_list.txt doesn't exists
+        empty_dir(ENCRYPTDIR);
+    }
     // TODO only 10 files to be chosen random for key creation
+    // Initializing added_files array
+    added_files = malloc(numberoffiles*sizeof(char*));
     while(NULL != fgets(buff, 255, newfd))
     {
         token = strtok(buff, ",");
         if(filecount>=numberoffiles){
             numberoffiles++;
             added_files = realloc(added_files, numberoffiles*sizeof(char*)); 
+            //i++;
+            //added_files[i] = malloc(255*sizeof(char));
         }
-        added_files[filecount] = strndup(token, 255);
-        filecount++;
+        if(encrypted_files_exists == 1)
+        {
+            for(k=0; k<oldnumberoffiles; k++)
+            {
+                // Compare the new filepath with the already encrypted file path
+                if(strcmp(old_encrypted_files[k], token) != 0)
+                {
+                    unencrypted_file = 1;
+                }
+                else 
+                {
+                    unencrypted_file = 0;
+                    break; 
+                }
+            }
+            if(unencrypted_file == 1)
+            {
+                added_files[filecount] = strndup(token, 255);
+                filecount++;
+            }
+        }
+        else
+        {
+            added_files[filecount] = strndup(token, 255);
+            filecount++;
+        }
+
+    }
+    // Initializing unitialized space of added_files array
+    for(i=filecount;i<numberoffiles;i++)
+    {
+        added_files[i] = malloc(255*sizeof(char));
     }
     // Call function to create key and encrypt files in added_files array
-    photostovis_run_encryption(added_files, numberoffiles);
+    photostovis_run_encryption(added_files, filecount);
+
+    // Free heap allocations
+    if(encrypted_files_exists == 1){
+        for(k=0; k<oldnumberoffiles; k++){
+            free(old_encrypted_files[k]);
+        }
+        fclose(oldfd);
+    }
     for(k=0; k<numberoffiles; k++){
         free(added_files[k]);
     }
+    free(old_encrypted_files);
     free(added_files);
     fclose(newfd);
 }
@@ -190,8 +319,8 @@ void photostovis_encrypt_files()
 {
     // Check to see if encrypted directory exists, if not create one
     struct stat st = {0};
-    if (stat("./encrypted", &st) == -1) {
-        mkdir("./encrypted", 0700);
+    if (stat(ENCRYPTDIR, &st) == -1) {
+        mkdir(ENCRYPTDIR, 0700);
     }
 
     scramblerInitialize();
