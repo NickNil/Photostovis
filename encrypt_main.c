@@ -39,12 +39,15 @@ void empty_dir(char *path)
     {
         while((direntry = readdir(dirptr)) != NULL)
         {
-            strcpy(filepath, path);
-            strcat(filepath, "/");
-            strcat(filepath, direntry->d_name);
-            if(unlink(filepath) != 0)
+            if(strcmp(direntry->d_name, ".") != 0 && strcmp(direntry->d_name, ".."))
             {
-                printf("\nError deleting %s \n", filepath);
+                strcpy(filepath, path);
+                strcat(filepath, "/");
+                strcat(filepath, direntry->d_name);
+                if(unlink(filepath) != 0)
+                {
+                    printf("\nError deleting %s \n", filepath);
+                }
             }
         }
     }
@@ -52,7 +55,7 @@ void empty_dir(char *path)
 }
 
 // Create random name for encrypted files
-void createfilename(char *pw){
+void createfilename(char *filename){
     int i=0, j=0, k=0, rem, nchars;
     unsigned int r;
     nchars = strlen(charset);
@@ -60,11 +63,11 @@ void createfilename(char *pw){
         r = random();
         for(j=0; j<8; j++){
             rem = r%nchars;
-            pw[k++] = charset[rem];
+            filename[k++] = charset[rem];
             r/=nchars;
         }
     }
-    pw[k] = '\0';
+    filename[k] = '\0';
     return;
 }
 
@@ -169,7 +172,10 @@ void photostovis_run_encryption(char **added_files, int numberoffiles)
                 exit(-1);
             }
 
+            // Calling encrypt function to scramble file contents
             scrambleFileContents(shifted_files[pic], encrypted_files[pic], keySequence, KEYLEN);
+
+            // Write encrypted file path and random generated name to encrypted_list file
             memset(encrypted_list_content, 0, 255);
             strncpy(encrypted_list_content, added_files[pic], 255);
             strcat(encrypted_list_content, "\",");
@@ -203,7 +209,7 @@ void photostovis_run_encryption(char **added_files, int numberoffiles)
 }
 
 // Reading from the text file where new added files are listed
-void photostovis_read_newfiles()
+void photostovis_read_newfiles(char *newfilelist)
 {
     // Reading new added files in filesadded.txt file
     FILE* newfd = NULL, *oldfd = NULL;
@@ -214,7 +220,7 @@ void photostovis_read_newfiles()
     char **added_files, **old_encrypted_files;
     old_encrypted_files = malloc(oldnumberoffiles*sizeof(char*));
     // TODO Provide the file to read
-    newfd = fopen(NEWFILELIST, "r");
+    newfd = fopen(newfilelist, "r");
     if(NULL == newfd)
     {
         printf("\n fopen() Error!!\n");
@@ -243,7 +249,7 @@ void photostovis_read_newfiles()
             old_encrypted_files[filecount] = strndup(token, 255);
             filecount++;
         }
-        printf("\n Encrypted list file exists = %d\n", encrypted_files_exists);
+        //printf("\n Encrypted list file exists = %d\n", encrypted_files_exists);
         filecount = 0;
     }
     else
@@ -324,6 +330,6 @@ void photostovis_encrypt_files()
     }
 
     scramblerInitialize();
-    photostovis_read_newfiles();
+    photostovis_read_newfiles(NEWFILELIST);
 }
 
