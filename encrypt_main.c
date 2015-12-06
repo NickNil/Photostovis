@@ -41,9 +41,9 @@ void empty_dir(char *path)
         {
             if(strcmp(direntry->d_name, ".") != 0 && strcmp(direntry->d_name, ".."))
             {
-                strcpy(filepath, path);
-                strcat(filepath, "/");
-                strcat(filepath, direntry->d_name);
+                strncpy(filepath, path, strlen(path));
+                strncat(filepath, "/", strlen("/"));
+                strncat(filepath, direntry->d_name, strlen(direntry->d_name));
                 if(unlink(filepath) != 0)
                 {
                     printf("\nError deleting %s \n", filepath);
@@ -76,8 +76,8 @@ void createfilename(char *filename){
 void save_file(char *filename, char *pic_file) 
 {
     strncpy(filename, ENCRYPTDIR, sizeof(ENCRYPTDIR));
-    strcat(filename, "/");
-    strcat(filename, pic_file);
+    strncat(filename, "/", strlen("/"));
+    strncat(filename, pic_file, strlen(pic_file));
 }
 
 // Create Key and Encrypt files
@@ -178,9 +178,9 @@ void photostovis_run_encryption(char **added_files, int numberoffiles)
             // Write encrypted file path and random generated name to encrypted_list file
             memset(encrypted_list_content, 0, 255);
             strncpy(encrypted_list_content, added_files[pic], 255);
-            strcat(encrypted_list_content, "\",");
-            strcat(encrypted_list_content, pic_file);
-            strcat(encrypted_list_content, "\n");
+            strncat(encrypted_list_content, "\",", strlen("\","));
+            strncat(encrypted_list_content, pic_file, strlen(pic_file));
+            strncat(encrypted_list_content, "\n", strlen("\n"));
             if(strlen(encrypted_list_content) != fwrite((encrypted_list_content), 1, strlen(encrypted_list_content), encrypted_list))
             {
                 printf("\n fwrite() Error!!\n");
