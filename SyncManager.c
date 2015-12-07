@@ -183,19 +183,20 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
     write(socket, &htonl_size, sizeof(uint32_t)); //sending image number
     printf("image number: %d\n", size);
 
-    int i;
+    int i, image_counter = 1;
     for(i = 0; i < size; i++)
     {
-
+        printf("\nimage number: %d\n", image_counter);
         // Ensure we only are working on valid files
         if (result[i].fileHash != NULL)
         {
-           printf("\nSaving file: %s", result[i].fileHash);
+           //printf("\nSaving file: %s", result[i].fileHash);
         }
         send_image(socket, result[i].filePath, basePath);
 
         //close(socket);
         usleep(150000);
+        image_counter++;
     }
 
    //send_image(socket, "/home/global-sw-dev/Photostovis/image-03.jpg");

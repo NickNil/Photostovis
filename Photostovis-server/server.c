@@ -100,7 +100,7 @@ char *readp(int sockfd) {
     }
     //rec_message[rec_msg_len] = '\0';
     //printf(" Received Message length = %d\n", rec_msg_len);
-    printf(" Message Received from client = %s\n", rec_message);
+    //printf(" Message Received from client = %s\n", rec_message);
     return rec_message;
 }
 
@@ -156,6 +156,8 @@ int listen_for_connection(int sockfd, char argv0[], int port){
 void client_process(int socket)
 {
     uint32_t images = 0;
+    int counter = 0;
+    int check = 0;
 
     read(socket, &images, sizeof(uint32_t));
     images = ntohl(images);
@@ -166,11 +168,18 @@ void client_process(int socket)
         printf("picture: %d\n\n", i+1);
         if(socket >= 0)
         {
-            receive_image(socket);
+            check = receive_image(socket);
         }
-
+        if(check != 0)
+        {
+            printf("total number of images received: %d", counter);
+            close(socket);
+            exit(0);
+        }
+        counter++;
         i++;
     }
+    printf("total number of images received: %d", counter);
     printf("server is up to date\n");
 
     close(socket);
@@ -234,7 +243,7 @@ int send_file(int socket)
 }
 
 //function to receive an image, only use if certain an image is to be sent
-void receive_image(int socket)
+int receive_image(int socket)
 {
     int packet_size = 0, receive_size = 0;
     uint32_t image_size = 0;
@@ -244,7 +253,7 @@ void receive_image(int socket)
     char image_name[256];
     char image_path[256];
     char *rec_image_path;
-    char* base_path = "/home/global-sw-dev/Photostovis/backup-pictures/";
+    char* base_path = "/home/global-sw-dev/Photostovis/backup-pictures";
     char new_path[1000];
     char new_path_cpy[1000];
     char pict_array[10241];
@@ -260,11 +269,16 @@ void receive_image(int socket)
     bzero(new_path_cpy, 1000);
 
     rec_image_path = readp(socket);
-    printf("\nimage path: %s\n", rec_image_path);
+    if (strcmp(rec_image_path, "-1") == 0)
+    {
+        printf("\nconnection with client lost\n");
+        return -1;
+    }
+    //printf("\nimage path: %s\n", rec_image_path);
 
     strcpy(image_path, rec_image_path);
     free(rec_image_path);
-    printf("copied image path: %s\n", image_path);
+    //printf("copied image path: %s\n", image_path);
 
     strcpy(image_name, basename(image_path));
 
@@ -280,9 +294,9 @@ void receive_image(int socket)
     strcpy(new_path_cpy, new_path);
     make_folders(new_path_cpy);
 
-    printf("\nnew path: %s\n", new_path);
+    //printf("\nnew path: %s\n", new_path);
 
-    printf("\nSAVING TO PATH: %s", new_path);
+    //printf("\nSAVING TO PATH: %s", new_path);
 
 
 
@@ -290,7 +304,7 @@ void receive_image(int socket)
     if (picture == NULL)
     {
         printf("ERROR LOADING IMAGE");
-        return;
+        return -1;
     }
 
 
@@ -313,11 +327,13 @@ void receive_image(int socket)
         if(buffer_fd < 0)
         {
             printf("error: bad file descriptor\n");
+            return -1;
         }
 
         if(buffer_fd == 0)
         {
             printf("error: buffer read timed out\n");
+            return -1;
         }
 
         if(buffer_fd > 0)
@@ -349,9 +365,9 @@ void receive_image(int socket)
 
 
     }
-    printf("packet number received: %i\n", packet_index);
-    printf("image size = %i\n", image_size);
-    printf("total received image size: %i\n\n", receive_size);
+    //printf("packet number received: %i\n", packet_index);
+    //printf("image size = %i\n", image_size);
+    //printf("total received image size: %i\n\n", receive_size);
 
 
     fclose(picture);
@@ -363,7 +379,8 @@ void receive_image(int socket)
 
     write_to_backup_file_on_server(new_path, hash_path, hash_content);
 
-    printf("image (hopefully) successfully received :D\n\n");
+    printf("image successfully received :D\n\n");
+    return 0;
 }
 
 void make_folders(char *path)
@@ -378,14 +395,14 @@ void make_folders(char *path)
 
     strcpy(dir, dirname(path));
 
-    printf("dir: %s\n ", dir);
+    //printf("dir: %s\n ", dir);
 
     if (stat(dir, &st) == -1) //directory does not exist
     {
         strcpy(dir_cpy, dir);
         make_folders(dir_cpy);
         mkdir(dir, 0777);
-        printf("made folder %s\n", dir);
+        //printf("made folder %s\n", dir);
     }
 
     return;

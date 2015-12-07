@@ -65,7 +65,7 @@ void sendp(int sockfd, char* message) {
     memcpy((char *)&buffer[0], (char *) &packet_len_buf, sizeof(uint16_t));
     memcpy(&buffer[2], message, data_len);
     int n = write(sockfd,buffer,tcp_msg_len);
-    printf("message from client: %s\n", buffer);
+    //printf("message from client: %s\n", buffer);
     if (n < 0) {
         perror("Write Error"); panic("Write Error");
     }
@@ -156,13 +156,14 @@ void send_image(int socket, char* imagepath, char* const basePath)
     int size, packet_size, read_size, packet_index = 1;
     uint32_t htonl_size = 0;
     char send_buffer[10240];
-    char *image_name;
+    char image_name[100];
     char *image_dir;
     char basePath_cpy[1000];
     packet_index = 1;
 
     bzero(send_buffer, 10240);
     bzero(basePath_cpy, 1000);
+    bzero(image_name, 100);
 
     picture = fopen(imagepath, "r");
 
@@ -173,18 +174,20 @@ void send_image(int socket, char* imagepath, char* const basePath)
 
     strcpy(basePath_cpy, basePath);
 
-    printf("Sending image: %s\n", image_name);
+    strcpy(image_name, imagepath);
 
-    printf("basepath: %s\n", basePath_cpy);
+    printf("Sending image: %s\n", basename(image_name));
+
+    //printf("basepath: %s\n", basePath_cpy);
     dirname(basePath_cpy);
-    printf("dirname basepath: %s\n", basePath_cpy);
+    //printf("dirname basepath: %s\n", basePath_cpy);
 
 
     image_dir = (char *) malloc(strlen(imagepath) - strlen(basePath_cpy) + 1);
 
     strcpy(image_dir, &imagepath[strlen(basePath_cpy)]);
 
-    printf("inner folders: %s\n", image_dir);
+    //printf("inner folders: %s\n", image_dir);
 
     sendp(socket, image_dir); //sending image path
 
@@ -193,18 +196,11 @@ void send_image(int socket, char* imagepath, char* const basePath)
     fseek(picture, 0, SEEK_END);
     size = ftell(picture);			//getting image size
     fseek(picture, 0, SEEK_SET);
-    printf("picture size  = %i\n", size);
+    //printf("picture size  = %i\n", size);
     htonl_size = htonl(size); //converting size to network byte order
 
     write(socket, &htonl_size, sizeof(uint32_t)); //sending image size
     int sent = 0;
-
-    current_time = time(NULL);
-
-    // Convert to local time format.
-    c_time_string = ctime(&current_time);
-
-    printf("start time is %s\n\n", c_time_string);
 
     //sending image as a byte array
     while(!feof(picture))
@@ -225,15 +221,9 @@ void send_image(int socket, char* imagepath, char* const basePath)
         packet_index++;
         bzero(send_buffer, sizeof(send_buffer));
     }
-    printf("packet number: %i\n", packet_index);
-    printf("picture size  = %i\n", size);
-    printf("sent: %i\n", sent);
-    current_time = time(NULL);
-
-    // Convert to local time format.
-    c_time_string = ctime(&current_time);
-
-    printf("sent picture time is %s\n\n", c_time_string);
+    //printf("packet number: %i\n", packet_index);
+    //printf("picture size  = %i\n", size);
+    //printf("sent: %i\n", sent);
 
     fclose(picture);
 }
