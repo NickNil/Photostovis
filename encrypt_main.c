@@ -14,7 +14,7 @@
 #define KEYLEN 1024
 #define KEYFILE "keyfile.txt"
 // Path for saving encrypted files
-#define ENCRYPTDIR "./encrypted"
+#define ENCRYPTDIR "/home/global-sw-dev/encrypted"
 #define ENCRYPTEDLIST "encrypted_list.txt"
 #define NEWFILELIST "./textfiles/filesadded.txt"
 
@@ -81,7 +81,7 @@ void save_file(char *dir, char *filename, char *pic_file)
 }
 
 // Create Key and Encrypt files
-void photostovis_run_encryption(char **added_files, int numberoffiles)
+void photostovis_run_encryption(char **added_files, char **encryptedfilepath, int numberoffiles)
 {
     if(numberoffiles > 0)
     {
@@ -165,6 +165,7 @@ void photostovis_run_encryption(char **added_files, int numberoffiles)
             memset(pic_file, 0, 255);
             createfilename(pic_file);
             save_file(ENCRYPTDIR, encrypted_filename, pic_file); 
+            encryptedfilepath[pic] = strndup(encrypted_filename, 255);
             encrypted_files[pic] = fopen(encrypted_filename, "w+");
             if(NULL == encrypted_files[pic])
             {
@@ -178,7 +179,8 @@ void photostovis_run_encryption(char **added_files, int numberoffiles)
             // Write encrypted file path and random generated name to encrypted_list file
             memset(encrypted_list_content, 0, 255);
             strncpy(encrypted_list_content, added_files[pic], 255);
-            strcat(encrypted_list_content, "\",");
+            //strcat(encrypted_list_content, "\",");
+            strcat(encrypted_list_content, ",");
             strcat(encrypted_list_content, pic_file);
             strcat(encrypted_list_content, "\n");
             if(strlen(encrypted_list_content) != fwrite((encrypted_list_content), 1, strlen(encrypted_list_content), encrypted_list))
@@ -208,24 +210,130 @@ void photostovis_run_encryption(char **added_files, int numberoffiles)
     }
 }
 
-// Reading from the text file where new added files are listed
-void photostovis_read_newfiles(char *newfilelist)
+//// Reading from the text file where new added files are listed
+//void photostovis_read_newfiles(char *newfilelist)
+//{
+//    // Reading new added files in filesadded.txt file
+//    FILE* newfd = NULL, *oldfd = NULL;
+//    int numberoffiles = 4,  filecount = 0, k=0, i=0;
+//    int oldnumberoffiles = 4, encrypted_files_exists = 0, unencrypted_file = 0;
+//    char buff[255];
+//    char *token;
+//    char **added_files, **old_encrypted_files;
+//    old_encrypted_files = malloc(oldnumberoffiles*sizeof(char*));
+//    // TODO Provide the file to read
+//    newfd = fopen(newfilelist, "r");
+//    if(NULL == newfd)
+//    {
+//        printf("\n fopen() Error!!\n");
+//        exit(-1);
+//    }
+//    // Check if file containing list of already encrypted files exists 
+//    if(file_exists(ENCRYPTEDLIST) == 0)
+//    {
+//        encrypted_files_exists = 1;
+//        oldfd = fopen(ENCRYPTEDLIST, "r");
+//
+//        if(NULL == oldfd)
+//        {
+//            printf("\n fopen() Error!!\n");
+//            exit(-1);
+//
+//        }
+//        // Reading list of old encrypted files 
+//        while(NULL != fgets(buff, 255, oldfd))
+//        {
+//            token = strtok(buff, ",");
+//            if(filecount>=oldnumberoffiles){
+//                oldnumberoffiles++;
+//                old_encrypted_files = realloc(old_encrypted_files, oldnumberoffiles*sizeof(char*)); 
+//            }
+//            old_encrypted_files[filecount] = strndup(token, 255);
+//            filecount++;
+//        }
+//        //printf("\n Encrypted list file exists = %d\n", encrypted_files_exists);
+//        filecount = 0;
+//    }
+//    else
+//    {
+//        // Empty encrypted directory if encrypted_list.txt doesn't exists
+//        empty_dir(ENCRYPTDIR);
+//    }
+//    // TODO only 10 files to be chosen random for key creation
+//    // Initializing added_files array
+//    added_files = malloc(numberoffiles*sizeof(char*));
+//    while(NULL != fgets(buff, 255, newfd))
+//    {
+//        token = strtok(buff, ",");
+//        if(filecount>=numberoffiles){
+//            numberoffiles++;
+//            added_files = realloc(added_files, numberoffiles*sizeof(char*)); 
+//            //i++;
+//            //added_files[i] = malloc(255*sizeof(char));
+//        }
+//        if(encrypted_files_exists == 1)
+//        {
+//            for(k=0; k<oldnumberoffiles; k++)
+//            {
+//                // Compare the new filepath with the already encrypted file path
+//                if(strcmp(old_encrypted_files[k], token) != 0)
+//                {
+//                    unencrypted_file = 1;
+//                }
+//                else 
+//                {
+//                    unencrypted_file = 0;
+//                    break; 
+//                }
+//            }
+//            if(unencrypted_file == 1)
+//            {
+//                added_files[filecount] = strndup(token, 255);
+//                filecount++;
+//            }
+//        }
+//        else
+//        {
+//            added_files[filecount] = strndup(token, 255);
+//            filecount++;
+//        }
+//
+//    }
+//    // Initializing unitialized space of added_files array
+//    for(i=filecount;i<numberoffiles;i++)
+//    {
+//        added_files[i] = malloc(255*sizeof(char));
+//    }
+//    // Call function to create key and encrypt files in added_files array
+//    photostovis_run_encryption(added_files, filecount);
+//
+//    // Free heap allocations
+//    if(encrypted_files_exists == 1){
+//        for(k=0; k<oldnumberoffiles; k++){
+//            free(old_encrypted_files[k]);
+//        }
+//        fclose(oldfd);
+//    }
+//    for(k=0; k<numberoffiles; k++){
+//        free(added_files[k]);
+//    }
+//    free(old_encrypted_files);
+//    free(added_files);
+//    fclose(newfd);
+//}
+
+// Reading from the encrypted list text file 
+int photostovis_check_duplicate_entry(char **unsynced_files, char **encryptedfilepath, int numberoffiles)
 {
     // Reading new added files in filesadded.txt file
-    FILE* newfd = NULL, *oldfd = NULL;
-    int numberoffiles = 4,  filecount = 0, k, i;
+    FILE *oldfd = NULL;
+    int filecount = 0, k=0, i=0, index=0;
     int oldnumberoffiles = 4, encrypted_files_exists = 0, unencrypted_file = 0;
     char buff[255];
     char *token;
     char **added_files, **old_encrypted_files;
     old_encrypted_files = malloc(oldnumberoffiles*sizeof(char*));
-    // TODO Provide the file to read
-    newfd = fopen(newfilelist, "r");
-    if(NULL == newfd)
-    {
-        printf("\n fopen() Error!!\n");
-        exit(-1);
-    }
+
     // Check if file containing list of already encrypted files exists 
     if(file_exists(ENCRYPTEDLIST) == 0)
     {
@@ -260,21 +368,14 @@ void photostovis_read_newfiles(char *newfilelist)
     // TODO only 10 files to be chosen random for key creation
     // Initializing added_files array
     added_files = malloc(numberoffiles*sizeof(char*));
-    while(NULL != fgets(buff, 255, newfd))
+    for(index=0; index<numberoffiles; index++)
     {
-        token = strtok(buff, ",");
-        if(filecount>=numberoffiles){
-            numberoffiles++;
-            added_files = realloc(added_files, numberoffiles*sizeof(char*)); 
-            //i++;
-            //added_files[i] = malloc(255*sizeof(char));
-        }
         if(encrypted_files_exists == 1)
         {
             for(k=0; k<oldnumberoffiles; k++)
             {
                 // Compare the new filepath with the already encrypted file path
-                if(strcmp(old_encrypted_files[k], token) != 0)
+                if(strcmp(old_encrypted_files[k], unsynced_files[index]) != 0)
                 {
                     unencrypted_file = 1;
                 }
@@ -286,24 +387,24 @@ void photostovis_read_newfiles(char *newfilelist)
             }
             if(unencrypted_file == 1)
             {
-                added_files[filecount] = strndup(token, 255);
+                added_files[filecount] = strndup(unsynced_files[index], 255);
                 filecount++;
             }
         }
         else
         {
-            added_files[filecount] = strndup(token, 255);
+            added_files[filecount] = strndup(unsynced_files[index], 255);
             filecount++;
         }
 
-    }
-    // Initializing unitialized space of added_files array
-    for(i=filecount;i<numberoffiles;i++)
-    {
-        added_files[i] = malloc(255*sizeof(char));
+        // Initializing unitialized space of added_files array
+        for(i=filecount;i<numberoffiles;i++)
+        {
+            added_files[i] = malloc(255*sizeof(char));
+        }
     }
     // Call function to create key and encrypt files in added_files array
-    photostovis_run_encryption(added_files, filecount);
+    photostovis_run_encryption(added_files, encryptedfilepath, filecount);
 
     // Free heap allocations
     if(encrypted_files_exists == 1){
@@ -317,19 +418,23 @@ void photostovis_read_newfiles(char *newfilelist)
     }
     free(old_encrypted_files);
     free(added_files);
-    fclose(newfd);
+    return filecount;
 }
 
 // Encrypt function called from main program
-void photostovis_encrypt_files()
+int photostovis_encrypt_files(char **unsynced_files, char **encryptedfilepath, int numberoffiles)
 {
     // Check to see if encrypted directory exists, if not create one
     struct stat st = {0};
     if (stat(ENCRYPTDIR, &st) == -1) {
         mkdir(ENCRYPTDIR, 0700);
     }
+    int filecount = 0;
 
     scramblerInitialize();
-    photostovis_read_newfiles(NEWFILELIST);
+    //photostovis_read_newfiles(NEWFILELIST);
+    filecount = photostovis_check_duplicate_entry(unsynced_files, encryptedfilepath, numberoffiles);
+    //photostovis_run_encryption(unsynced_files, numberoffiles);
+    return filecount;
 }
 

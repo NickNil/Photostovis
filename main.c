@@ -144,12 +144,12 @@ int main (int argc, char **argv)
      }
      */
 
-     if(arguments.encrypt)
-     {
-       printf("\nEncrypting Files\n");
-       photostovis_encrypt_files();
-       printf("\nDone Encrypting files, Encrypted files saved in ./encrypted folder\n");
-     }
+     //if(arguments.encrypt)
+     //{
+     //  printf("\nEncrypting Files\n");
+     //  photostovis_encrypt_files();
+     //  printf("\nDone Encrypting files, Encrypted files saved in ./encrypted folder\n");
+     //}
 
      char full_exe_path[1024]; // full path to executable folder
      ssize_t len = readlink("/proc/self/exe", full_exe_path, sizeof(full_exe_path)-1);
@@ -164,10 +164,17 @@ int main (int argc, char **argv)
      const unsigned int pathLength = strlen(arguments.backup_file_path);
      photostovis_get_filenames_from_client(arguments.backup_file_path, pathLength, full_exe_path);
      printf("Syncing files to server...");
-     photostovis_sync_files_to_server(socket, server, port, arguments.backup_file_path, full_exe_path);
+     if(arguments.encrypt)
+     {
+        printf("\nencrypt argument provided...\n");
+        photostovis_sync_files_to_server(socket, server, port, arguments.backup_file_path, full_exe_path, 1);
+     }
+     else
+     {
+        photostovis_sync_files_to_server(socket, server, port, arguments.backup_file_path, full_exe_path, 0);
+     }
      printf("Done syncing files to server!\n");
   }
-
 
   close(socket);
 

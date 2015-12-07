@@ -1,6 +1,7 @@
 
 #include "client.h"
 #include "SyncManager.h"
+#include "encrypt_main.h"
 
 #define ARRAYSIZE(x)  (sizeof(x)/sizeof(*(x)))
 #define SHA256_DIGEST_LENGTH 32
@@ -124,7 +125,7 @@ unsigned int photostovis_read_number_of_lines_in_file(FILE* fp)
 /**
  * @brief Syncronizes files between client and server
  */
-void photostovis_sync_files_to_server(int socket, char* server2, unsigned int port, char* const basePath, char full_exe_path[1024])
+void photostovis_sync_files_to_server(int socket, char* server2, unsigned int port, char* const basePath, char full_exe_path[1024], int encrypt)
 {
     receive_file(socket);
     printf("RECIEVED BACKUPFILE\n");
@@ -184,6 +185,42 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
     printf("image number: %d\n", size);
 
     int i, image_counter = 1;
+
+    // Encrypt file before sending
+    if(encrypt){
+        int encrypted_filecount = 0;
+        printf("\nEncrypting Files\n");
+        //struct BackupFileContent encrypt_file[size];
+        char **unsynced_files, **encryptedfilepath;
+        unsynced_files = malloc(size*sizeof(char*));
+        encryptedfilepath = malloc(size*sizeof(char*));
+        for(i = 0; i < size; i++)
+        {
+
+            unsynced_files[i] = malloc(255*sizeof(char));
+            encryptedfilepath[i] = malloc(255*sizeof(char));
+            strcpy(unsynced_files[i], result[i].filePath);
+
+        }
+        encrypted_filecount = photostovis_encrypt_files(unsynced_files, encryptedfilepath, size);
+        for(i = 0; i< size; i++)
+        {
+            free(unsynced_files[i]);
+        }
+        free(unsynced_files);
+        printf("\nDone Encrypting files, Encrypted files saved in ./encrypted folder\n");
+        for(i = 0; i < size; i++)
+        {
+            result[i].filePath = encryptedfilepath[i];
+            //printf("\nEncrypted file path = %s\n", result[i].filePath);
+        }
+        for(i = 0; i< size; i++)
+        {
+            free(encryptedfilepath[i]);
+        }
+        free(encryptedfilepath);
+        size = encrypted_filecount;
+    }
     for(i = 0; i < size; i++)
     {
         printf("\nimage number: %d\n", image_counter);
