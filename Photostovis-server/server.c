@@ -185,7 +185,7 @@ int send_file(int socket)
     char send_buffer[256];
     struct stat file_stat;
 
-    text_file  = fopen("/home/global-sw-dev/Photostovis/server-backup.txt", "r");
+    text_file  = fopen("./server-backup.txt", "r");
 
     if(text_file == NULL)
     {
@@ -194,7 +194,7 @@ int send_file(int socket)
     }
 
     //finding file size
-    if (stat("/home/global-sw-dev/Photostovis/server-backup.txt", &file_stat) < 0)
+    if (stat("./server-backup.txt", &file_stat) < 0)
     {
         printf("error with file stat: %s", strerror(errno));
         return -1;
@@ -244,7 +244,7 @@ void receive_image(int socket)
     char image_name[256];
     char image_path[256];
     char *rec_image_path;
-    char* base_path = "/home/global-sw-dev/Photostovis/backup-pictures";
+    char* base_path = "./backup-pictures";
     char new_path[1000];
     char new_path_cpy[1000];
     char pict_array[10241];
@@ -530,7 +530,7 @@ void sha256_hash_string (char hash[SHA256_BLOCK_SIZE], char outputBuffer[65])
 
 void write_to_backup_file_on_server(char* path, char hash_path[65], char hash_file[65])
 {
-    char* backup_path = "/home/global-sw-dev/Photostovis/server-backup.txt";
+    char* backup_path = "./server-backup.txt";
     FILE* file = fopen(backup_path, "a");
     fprintf(file,"%s",path);
     fprintf(file,"%s",",");
