@@ -158,9 +158,11 @@ void send_image(int socket, char* imagepath, char* const basePath)
     char send_buffer[10240];
     char *image_name;
     char *image_dir;
+    char basePath_cpy[1000];
     packet_index = 1;
 
     bzero(send_buffer, 10240);
+    bzero(basePath_cpy, 1000);
 
     picture = fopen(imagepath, "r");
 
@@ -169,11 +171,18 @@ void send_image(int socket, char* imagepath, char* const basePath)
         printf("error opening image\n");
     }
 
+    strcpy(basePath_cpy, basePath);
+
     printf("Sending image: %s\n", image_name);
 
-    image_dir = (char *) malloc(strlen(imagepath) - strlen(basePath) + 1);
+    printf("basepath: %s\n", basePath_cpy);
+    dirname(basePath_cpy);
+    printf("dirname basepath: %s\n", basePath_cpy);
 
-    strcpy(image_dir, &imagepath[strlen(basePath)]);
+
+    image_dir = (char *) malloc(strlen(imagepath) - strlen(basePath_cpy) + 1);
+
+    strcpy(image_dir, &imagepath[strlen(basePath_cpy)]);
 
     printf("inner folders: %s\n", image_dir);
 
