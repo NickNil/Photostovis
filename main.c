@@ -63,7 +63,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
       arguments->repeat_count = arg ? atoi (arg) : 10;
       break;
     case 'e':
-      arguments->encrypt = 1;
+      arguments->encrypt = arg ? atoi (arg) : 1;
       break;
     case OPT_ABORT:
       arguments->abort = 1;

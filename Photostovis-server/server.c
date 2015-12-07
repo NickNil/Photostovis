@@ -15,7 +15,7 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <sys/socket.h> /* socket api */
-#include <netinet/in.h> /* inetaddr stucts */
+#include <netinet/in.h> /* inetaddr stus */
 #include <netdb.h> /* gethostbyname() */
 #include <arpa/inet.h>
 #include <string.h>
@@ -244,7 +244,7 @@ void receive_image(int socket)
     char image_name[256];
     char image_path[256];
     char *rec_image_path;
-    char* base_path = "/home/global-sw-dev/Photostovis/backup-pictures/";
+    char* base_path = "/home/global-sw-dev/Photostovis/backup-pictures";
     char new_path[1000];
     char new_path_cpy[1000];
     char pict_array[10241];
