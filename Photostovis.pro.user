@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.4.2, 2015-12-07T13:16:36. -->
+<!-- Written by QtCreator 3.4.2, 2015-12-07T15:10:16. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -241,7 +241,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Photostovis</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/global-sw-dev/Photostovis/Photostovis.pro</value>
-    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments">--sync 1 --server 127.0.01:8000 --path &quot;/home/global-sw-dev/pictures/&quot;</value>
+    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments">--sync 1 --server 127.0.01:8000 --path &quot;/home/global-sw-dev/Pictures/&quot; --encrypt 1</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">Photostovis.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseTerminal">true</value>

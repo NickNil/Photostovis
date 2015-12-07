@@ -118,7 +118,7 @@ int receive_file(int socket)
     //printf("packet size = %i\n", packet_size);
     //printf("image size = %i\n", file_size);
 
-    received_file = fopen("/home/global-sw-dev/Photostovis/received_backup.txt", "w");
+    received_file = fopen("./received_backup.txt", "w");
 
     while(receive_size < file_size)
     {
