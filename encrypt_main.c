@@ -182,7 +182,7 @@ void photostovis_run_encryption(char **added_files, char **encryptedfilepath, in
             //strcat(encrypted_list_content, "\",");
             strcat(encrypted_list_content, ",");
             strcat(encrypted_list_content, pic_file);
-            strcat(encrypted_list_content, "\n");
+            strcat(encrypted_list_content, ",\n");
             if(strlen(encrypted_list_content) != fwrite((encrypted_list_content), 1, strlen(encrypted_list_content), encrypted_list))
             {
                 printf("\n fwrite() Error!!\n");

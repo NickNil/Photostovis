@@ -127,6 +127,8 @@ unsigned int photostovis_read_number_of_lines_in_file(FILE* fp)
  */
 void photostovis_sync_files_to_server(int socket, char* server2, unsigned int port, char* const basePath, char full_exe_path[1024], int encrypt)
 {
+    char *pictureFolder = malloc(255*sizeof(char));
+    pictureFolder = strndup(basePath, 255);
     receive_file(socket);
     printf("RECIEVED BACKUPFILE\n");
 
@@ -188,6 +190,40 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
 
     // Encrypt file before sending
     if(encrypt){
+        char *enctoken;
+        char *token, *tokenPath, *tokenFile;
+        char buff[100];
+        FILE *efd = NULL;
+        char **encrypted_unsynced;
+        int enc_unsync = 0;
+        encrypted_unsynced = malloc(size*sizeof(char*));
+        if(!file_exists("encrypted_list.txt"))
+        {
+            efd = fopen("encrypted_list.txt", "r");
+            if(efd == NULL)
+            {
+                printf("\nError opening encrypted list file\n");
+                exit(-1);
+            }
+            while(NULL != fgets(buff, 255, efd))
+            {
+                tokenPath = photostovis_backup_file_getfield(buff, 0);
+                tokenFile = photostovis_backup_file_getfield(buff, 1);
+                enctoken = malloc(255*sizeof(char));
+                token = strndup(tokenPath, 255);
+                for(i = 0; i < size; i++){
+                    if(!strcmp(result[i].filePath, token))
+                    {
+                        save_file("/home/global-sw-dev/encrypted", enctoken, tokenFile);
+                        encrypted_unsynced[enc_unsync] = malloc(255*sizeof(char));
+                        //strcpy(encrypted_unsynced[enc_unsync], result[i].filePath);
+                        strcpy(encrypted_unsynced[enc_unsync], enctoken);
+                        enc_unsync++;
+                    }
+                }
+                free(enctoken);
+            }
+        }
         int encrypted_filecount = 0;
         printf("\nEncrypting Files\n");
         //struct BackupFileContent encrypt_file[size];
@@ -209,17 +245,27 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
         }
         free(unsynced_files);
         printf("\nDone Encrypting files, Encrypted files saved in ./encrypted folder\n");
-        for(i = 0; i < size; i++)
+        for(i = 0; i < enc_unsync; i++)
         {
-            strcpy(result[i].filePath, encryptedfilepath[i]);
-            //printf("\nEncrypted file path = %s\n", result[i].filePath);
+            strcpy(result[i].filePath,encrypted_unsynced[i]);
+        }
+        //printf("\nenc unsync = %d\n", enc_unsync);
+        for(i = enc_unsync; i < size; i++)
+        {
+            strcpy(result[i].filePath,encryptedfilepath[i]);
         }
         for(i = 0; i< size; i++)
         {
             free(encryptedfilepath[i]);
         }
+        for(i = 0; i< enc_unsync; i++)
+        {
+            free(encrypted_unsynced[i]);
+        }
         free(encryptedfilepath);
-        size = encrypted_filecount;
+        free(encrypted_unsynced);
+        size = enc_unsync + encrypted_filecount;
+        //printf("\n filecount = %d\n", size);
     }
     for(i = 0; i < size; i++)
     {
@@ -229,12 +275,15 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
         {
            //printf("\nSaving file: %s", result[i].fileHash);
         }
+        //printf("\n Encrypted files = %s\n", result[i].filePath);
+        //printf("\n Encrypted basePath files = %s\n", pictureFolder);
         send_image(socket, result[i].filePath, basePath);
 
         //close(socket);
         usleep(150000);
         image_counter++;
     }
+    free(pictureFolder);
 
    //send_image(socket, "/home/global-sw-dev/Photostovis/image-03.jpg");
 
