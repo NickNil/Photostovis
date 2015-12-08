@@ -5,6 +5,7 @@
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<unistd.h>
+#include<pwd.h>
 #include "scrambler.h"
 #include "error_mgmt.h"
 #include "boyer_moore.h"
@@ -14,11 +15,18 @@
 #define KEYLEN 1024
 #define KEYFILE "keyfile.txt"
 // Path for saving encrypted files
-#define ENCRYPTDIR "/home/global-sw-dev/encrypted"
+#define ENCRYPTDIR "encrypted"
 #define ENCRYPTEDLIST "encrypted_list.txt"
 #define NEWFILELIST "./textfiles/filesadded.txt"
 
 char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789";
+
+char* get_home_dir()
+{
+    struct passwd *passwdEnt = getpwuid(getuid());
+    char *home = passwdEnt->pw_dir;
+    return home;
+}
 
 // Checks if the given file is accessible or not
 int file_exists(char *filename)
@@ -32,8 +40,14 @@ void empty_dir(char *path)
     DIR *dirptr;
     struct dirent *direntry;
     char filepath[255];
+    char *dirpath;
+    dirpath = malloc(255*sizeof(char));
 
-    dirptr = opendir(path);
+    strcpy(dirpath, get_home_dir());
+    strcat(dirpath, "/");
+    strcat(dirpath, path);
+
+    dirptr = opendir(dirpath);
 
     if(dirptr != NULL)
     {
@@ -41,7 +55,7 @@ void empty_dir(char *path)
         {
             if(strcmp(direntry->d_name, ".") != 0 && strcmp(direntry->d_name, ".."))
             {
-                strcpy(filepath, path);
+                strcpy(filepath, dirpath);
                 strcat(filepath, "/");
                 strcat(filepath, direntry->d_name);
                 if(unlink(filepath) != 0)
@@ -51,6 +65,7 @@ void empty_dir(char *path)
             }
         }
     }
+    free(dirpath);
     closedir(dirptr);
 }
 
@@ -75,7 +90,9 @@ void createfilename(char *filename){
 // Save encrypted file in specified folder
 void save_file(char *dir, char *filename, char *pic_file) 
 {
-    strncpy(filename, dir, 255);
+    strncpy(filename, get_home_dir(), 255);
+    strcat(filename, "/");
+    strcat(filename, dir);
     strcat(filename, "/");
     strcat(filename, pic_file);
 }
@@ -426,8 +443,13 @@ int photostovis_encrypt_files(char **unsynced_files, char **encryptedfilepath, i
 {
     // Check to see if encrypted directory exists, if not create one
     struct stat st = {0};
-    if (stat(ENCRYPTDIR, &st) == -1) {
-        mkdir(ENCRYPTDIR, 0700);
+    char *encrypted_folder;
+    encrypted_folder = malloc(255*sizeof(char));
+    strcpy(encrypted_folder, get_home_dir());
+    strcat(encrypted_folder, "/");
+    strcat(encrypted_folder, ENCRYPTDIR);
+    if (stat(encrypted_folder, &st) == -1) {
+        mkdir(encrypted_folder, 0700);
     }
     int filecount = 0;
 
@@ -435,6 +457,8 @@ int photostovis_encrypt_files(char **unsynced_files, char **encryptedfilepath, i
     //photostovis_read_newfiles(NEWFILELIST);
     filecount = photostovis_check_duplicate_entry(unsynced_files, encryptedfilepath, numberoffiles);
     //photostovis_run_encryption(unsynced_files, numberoffiles);
+    free(encrypted_folder);
     return filecount;
 }
+
 

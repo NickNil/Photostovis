@@ -214,7 +214,7 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
                 for(i = 0; i < size; i++){
                     if(!strcmp(result[i].filePath, token))
                     {
-                        save_file("/home/global-sw-dev/encrypted", enctoken, tokenFile);
+                        save_file("encrypted", enctoken, tokenFile);
                         encrypted_unsynced[enc_unsync] = malloc(255*sizeof(char));
                         //strcpy(encrypted_unsynced[enc_unsync], result[i].filePath);
                         strcpy(encrypted_unsynced[enc_unsync], enctoken);
