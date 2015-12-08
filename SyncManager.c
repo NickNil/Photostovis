@@ -211,7 +211,7 @@ void photostovis_sync_files_to_server(int socket, char* server2, unsigned int po
         printf("\nDone Encrypting files, Encrypted files saved in ./encrypted folder\n");
         for(i = 0; i < size; i++)
         {
-            result[i].filePath = encryptedfilepath[i];
+            strcpy(result[i].filePath, encryptedfilepath[i]);
             //printf("\nEncrypted file path = %s\n", result[i].filePath);
         }
         for(i = 0; i< size; i++)
