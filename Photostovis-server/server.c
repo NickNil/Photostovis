@@ -250,6 +250,18 @@ int receive_image(int socket)
     int read_size, write_size;
     int packet_index = 1;
 
+    char full_exe_path[1024]; // full path to executable folder
+    ssize_t len = readlink("/proc/self/exe", full_exe_path, sizeof(full_exe_path)-1);
+    if (len != -1) {
+       full_exe_path[len-19] = '\0';
+    }
+    else {
+      perror("ERROR: Path not found.");
+    }
+
+
+
+
     char image_name[256];
     char image_path[256];
     char *rec_image_path;
@@ -508,7 +520,7 @@ void hash_received_file_content_on_server(char* fullpath, char output[65])
     const int bufSize = 32768;
     char* buffer = malloc(bufSize);
     int bytesRead = 0;
-    if(!buffer) return -1;
+    if(!buffer) return;
     while((bytesRead = fread(buffer, 1, bufSize, file)))
     {
         sha256_update(&sha256, buffer, bytesRead);
@@ -518,7 +530,7 @@ void hash_received_file_content_on_server(char* fullpath, char output[65])
     sha256_hash_string(hash, output);
     fclose(file);
     free(buffer);
-    return 0;
+    return;
 }
 
 void hash_received_file_path_on_server(char* path, char output[65])

@@ -123,4 +123,5 @@ void photostovis_clear_backup_file(char full_exe_path[])
 
     FILE* file = fopen(backup_path, "w");
     fclose(file);
+    printf("Clearing local backup file");
 }
